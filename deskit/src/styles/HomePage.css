@@ -1,0 +1,25 @@
+/* src/styles/HomePage.css */
+.homepage {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;  /* 사진들 간의 간격 */
+    justify-content: center;  /* 가운데 정렬 */
+    padding: 20px;  /* 여백 */
+    width: 60%;
+    margin: 0 auto;
+  }
+  
+  .image-container {
+    width: calc(30% - 16px);  /* 한 줄에 3개 이미지 */
+    margin-bottom: 16px;  /* 사진 아래 여백 */
+  }
+  
+
+  
+  .image-container img {
+    width: 100%;  /* 이미지가 부모 요소의 너비를 채움 */
+    height: auto;  /* 이미지 비율을 유지 */
+    border-radius: 8px;  /* 이미지 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* 이미지에 그림자 */
+  }
+  

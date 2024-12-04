@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/SignUpPage.css';
 
 function SignUpPage() {
@@ -11,6 +11,9 @@ function SignUpPage() {
   const [address, setAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  
+  // 'useNavigate'로 변수 이름 변경
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,8 +44,12 @@ function SignUpPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // 서버에서 받은 토큰을 localStorage에 저장
+        localStorage.setItem('token', data.token);
         setSuccessMessage('회원가입이 완료되었습니다!');
         setErrorMessage('');
+        // 회원가입 후 프로필 페이지로 이동
+        navigate('/profile');  // 수정된 부분
       } else {
         setErrorMessage(data.message || '회원가입에 실패했습니다.');
         setSuccessMessage('');

@@ -14,18 +14,20 @@ const PORT = process.env.PORT || 3001;
 const SECRET_KEY = process.env.SECRET_KEY;  // 환경 변수에서 비밀 키 로드
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(bodyParser.json());
 
 // MongoDB 연결
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
     console.log('MongoDB connected');
-}).catch((err) => {
+  })
+  .catch((err) => {
     console.log('MongoDB connection error:', err);
-});
+  });
 
 // 사용자 모델 정의 (이름, 생일, 주소 추가)
 const UserSchema = new mongoose.Schema({
@@ -104,7 +106,40 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+// 사용자 프로필 라우트 (인증된 사용자만 접근)
+app.get('/profile', async (req, res) => {
+    const token = req.headers['authorization'];
+    console.log('Received token:', token);
+
+    if (!token) {
+        return res.status(403).json({ message: 'No token provided' });
+    }
+
+    try {
+        const tokenWithoutBearer = token.split(' ')[1];
+        // JWT 토큰 검증
+        const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+
+        // 토큰에 포함된 사용자 정보로 사용자 찾기
+        const user = await User.findById(decoded.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            name: user.name,
+            email: user.email,
+            birthday: user.birthday,
+            address: user.address,
+        });
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid or expired token' });
+    }
+});
+
 // 서버 시작
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+

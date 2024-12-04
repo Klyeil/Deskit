@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../styles/LoginPage.css';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();  // history에서 navigate로 변경
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,8 +21,11 @@ function LoginPage() {
 
       // 서버에서 인증 성공하면 메시지를 처리
       if (response.status === 200) {
+        // JWT 토큰을 localStorage에 저장
+        localStorage.setItem('token', response.data.token);
         alert('로그인 성공!');
-        window.location.href = '/'; // 홈 페이지로 이동
+        console.log("로그인 성공 후 프로필 페이지로 이동")
+        navigate('/profile');  // 로그인 후 프로필 페이지로 이동
       }
     } catch (err) {
       // 로그인 실패 시 에러 처리

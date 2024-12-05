@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Postcode from 'react-daum-postcode';
+import { AiOutlineClose } from 'react-icons/ai';
 import '../styles/SignUpPage.css';
 
 function SignUpPage() {
@@ -7,12 +9,14 @@ function SignUpPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [birthday, setBirthday] = useState('');
   const [address, setAddress] = useState('');
+  const [addressDetail, setAddressDetail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  
-  // 'useNavigate'로 변수 이름 변경
+  const [showPostcode, setShowPostcode] = useState(false); // 팝업 상태
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -23,13 +27,13 @@ function SignUpPage() {
       return;
     }
 
-    // 사용자 정보 객체 생성
     const userData = {
       email,
       password,
       name,
+      nickname,
       birthday,
-      address,
+      address: `${address} ${addressDetail}`,
     };
 
     try {
@@ -44,12 +48,10 @@ function SignUpPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // 서버에서 받은 토큰을 localStorage에 저장
         localStorage.setItem('token', data.token);
         setSuccessMessage('회원가입이 완료되었습니다!');
         setErrorMessage('');
-        // 회원가입 후 프로필 페이지로 이동
-        navigate('/profile');  // 수정된 부분
+        navigate('/profile');
       } else {
         setErrorMessage(data.message || '회원가입에 실패했습니다.');
         setSuccessMessage('');
@@ -58,6 +60,11 @@ function SignUpPage() {
       setErrorMessage('서버와 연결할 수 없습니다.');
       setSuccessMessage('');
     }
+  };
+
+  const handleAddressSearch = (data) => {
+    setAddress(data.address);
+    setShowPostcode(false); // 팝업 닫기
   };
 
   return (
@@ -109,6 +116,17 @@ function SignUpPage() {
         </div>
 
         <div className="form-group">
+          <label htmlFor="nickname">닉네임</label>
+          <input
+            type="text"
+            id="nickname"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group">
           <label htmlFor="birthday">생일</label>
           <input
             type="date"
@@ -125,8 +143,32 @@ function SignUpPage() {
             type="text"
             id="address"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
+            readOnly
+            onClick={() => setShowPostcode(true)} // 클릭 시 팝업 열기
+            placeholder="주소를 검색하려면 클릭하세요"
+          />
+        </div>
+
+        {showPostcode && (
+          <div className="postcode-overlay">
+            <div className="postcode-popup">
+              <AiOutlineClose
+                className="close-icon"
+                onClick={() => setShowPostcode(false)}
+              />
+              <Postcode onComplete={handleAddressSearch} />
+            </div>
+          </div>
+        )}
+
+        <div className="form-group">
+          <label htmlFor="addressDetail">상세 주소</label>
+          <input
+            type="text"
+            id="addressDetail"
+            value={addressDetail}
+            onChange={(e) => setAddressDetail(e.target.value)}
+            placeholder="상세 주소를 입력하세요"
           />
         </div>
 

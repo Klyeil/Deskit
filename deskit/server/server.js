@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 // 환경 변수 로드
 dotenv.config();
@@ -13,12 +16,19 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const SECRET_KEY = process.env.SECRET_KEY;  // 환경 변수에서 비밀 키 로드
 
+// 이미지 저장 경로 초기화 (uploads 폴더 생성)
+const uploadPath = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath); // 경로가 존재하지 않으면 생성
+}
+
 // Middleware
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
 }));
 app.use(bodyParser.json());
+app.use('/uploads', express.static(uploadPath));
 
 // MongoDB 연결
 mongoose.connect(process.env.MONGO_URI)
@@ -33,9 +43,11 @@ mongoose.connect(process.env.MONGO_URI)
 const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    name: { type: String, required: true },        // 이름 추가
-    birthday: { type: Date, required: true },      // 생일 추가
-    address: { type: String, required: true },      // 주소 추가
+    name: { type: String, required: true },
+    nickname: { type: String, required: true },
+    birthday: { type: Date, required: true },
+    address: { type: String, required: true },
+    profileImage: { type: String },
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -52,7 +64,7 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // 비밀번호 비교 (bcrypt로 해싱된 비밀번호와 비교)
+        // 비밀번호 비교
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
@@ -70,28 +82,35 @@ app.post('/login', async (req, res) => {
 
 // 회원가입 라우트
 app.post('/signup', async (req, res) => {
-    const { email, password, name, birthday, address } = req.body;
+    const { email, password, name, nickname, birthday, address } = req.body;
 
     try {
         // 필수 필드 검사
-        if (!email || !password || !name || !birthday || !address) {
+        if (!email || !password || !name || !nickname || !birthday || !address) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
         // 이미 이메일이 존재하는지 확인
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists' });
+            return res.status(400).json({ message: '이미 존재하는 이메일입니다.' });
+        }
+
+        // 닉네임 중복 검사
+        const existingUserByNickName = await User.findOne({ nickname });
+        if (existingUserByNickName) {
+            return res.status(400).json({ message: '이미 존재하는 사용자명입니다.' });
         }
 
         // 비밀번호 해싱
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // 새 사용자 저장 (이름, 생일, 주소 포함)
+        // 새 사용자 저장
         const newUser = new User({
             email,
             password: hashedPassword,
             name,
+            nickname,
             birthday,
             address,
         });
@@ -109,7 +128,6 @@ app.post('/signup', async (req, res) => {
 // 사용자 프로필 라우트 (인증된 사용자만 접근)
 app.get('/profile', async (req, res) => {
     const token = req.headers['authorization'];
-    console.log('Received token:', token);
 
     if (!token) {
         return res.status(403).json({ message: 'No token provided' });
@@ -120,7 +138,7 @@ app.get('/profile', async (req, res) => {
         // JWT 토큰 검증
         const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
 
-        // 토큰에 포함된 사용자 정보로 사용자 찾기
+        // 사용자 정보 조회
         const user = await User.findById(decoded.userId);
 
         if (!user) {
@@ -129,17 +147,81 @@ app.get('/profile', async (req, res) => {
 
         res.status(200).json({
             name: user.name,
+            nickname: user.nickname,
             email: user.email,
-            birthday: user.birthday,
+            birthday: user.birthday.toISOString().split('T')[0],
             address: user.address,
+            profileImage: user.profileImage,
         });
     } catch (error) {
         res.status(401).json({ message: 'Invalid or expired token' });
     }
 });
 
+// 이미지 저장 경로 설정
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // 파일명에 타임스탬프 추가
+  }
+});
+
+// multer 설정
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 최대 5MB
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('이미지 파일만 업로드 가능합니다.'));
+    }
+    cb(null, true);
+  }
+});
+
+// 프로필 업데이트 라우트 (이미지 파일 처리 추가)
+app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  try {
+    const tokenWithoutBearer = token.split(' ')[1];
+    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+
+    const { name, nickname, birthday, address } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      decoded.userId,
+      { 
+        name, 
+        nickname, 
+        birthday, 
+        address, 
+        profileImage: req.file ? `/uploads/${req.file.filename}` : undefined 
+      },
+      { new: true }
+    );
+
+    res.json({
+      message: 'Profile updated successfully!',
+      user: {
+        name: updatedUser.name,
+        nickname: updatedUser.nickname,
+        email: updatedUser.email,
+        birthday: updatedUser.birthday.toISOString().split('T')[0],
+        address: updatedUser.address,
+        profileImage: updatedUser.profileImage,
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: '프로필 업데이트 실패', error });
+  }
+});
+
 // 서버 시작
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-

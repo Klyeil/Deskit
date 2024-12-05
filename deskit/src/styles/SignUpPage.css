@@ -72,4 +72,80 @@
   .signup-btn:hover {
     background-color: #000000;
   }
+
+
+/* 주소 검색창 스타일링 */
+.address-container {
+    display: flex;
+    align-items: center;
+  }
+
+  #postcode-container {
+    width: 100%; /* 팝업 크기에 맞춤 */
+    height: 90%; /* 높이를 조정 */
+  }
+  
+  .address-container input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+  }
+  
+  .address-container button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-left: 0.5rem;
+    color: #007bff;
+  }
+  
+  .postcode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .postcode-popup {
+    position: relative; /* 기준이 되는 컨테이너 */
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 500px; /* 원하는 팝업 크기 */
+    height: 500px; /* 원하는 팝업 크기 */
+  }
+  
+  .close-icon {
+    position: absolute;
+    top: 10px; /* 팝업 내부의 위쪽 간격 */
+    right: 10px; /* 팝업 내부의 오른쪽 간격 */
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .close-icon:hover {
+    color: #ff0000; /* 호버 시 색상 변경 */
+  }
+  
+  
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
   

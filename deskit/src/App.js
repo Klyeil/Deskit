@@ -7,6 +7,12 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import ProfilePage from './pages/ProfilePage';
 import Footer from './components/Footer';  // Footer 컴포넌트 추가
+import PasswordCheckPage from './pages/PasswordCheckPage';
+import ProfileSettingsPage from './pages/ProfileSettingPage';
+import SiteSettingsPage from './pages/SiteSettingsPage';
+import FeedUpload from './pages/FeedUpload';
+import FeedDetail from './pages/FeedDetail';
+
 
 function App() {
   return (
@@ -17,6 +23,13 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/verify-password" element={<PasswordCheckPage />} />
+        <Route path="/profile/settings" element={<ProfileSettingsPage />} />
+        <Route path="/settings" element={<SiteSettingsPage />} />
+        <Route path="/upload" element={<FeedUpload />} />
+        <Route path="/feed/:feedId" element={<FeedDetail />} />
+
+
       </Routes>
       <Footer />  {/* Footer 추가 */}
     </div>

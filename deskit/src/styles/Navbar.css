@@ -1,40 +1,89 @@
 /* src/styles/Navbar.css */
 
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: #fff;
-    z-index: 1000;
-  }
-  
-  .navbar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    text-decoration: none;
-  }
-  
-  .nav-links {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .nav-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #333;
-    text-decoration: none;
-    font-size: 1.2rem;
-  }
-  
-  .nav-link:hover {
-    color: #007bff;
-  }
-  
-  .nav-link svg {
-    margin-right: 0.5rem;
-  }
-  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  z-index: 1000;
+}
+
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem; /* 간격을 1.5rem으로 조정 */
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.nav-link:hover {
+  color: #007bff;
+}
+
+.nav-link svg {
+  margin-right: 0.5rem;
+}
+
+/* User Icon and Dropdown Menu */
+.nav-link.user-icon {
+  position: relative; /* 드롭다운 메뉴를 상대적으로 위치시키기 위해 */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 200%; /* 아이콘 바로 아래에 위치 */
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 140px; /* 메뉴 넓이 */
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  visibility: hidden; /* 기본적으로 메뉴 숨기기 */
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0s 0.3s; /* 애니메이션 추가 */
+}
+
+.dropdown-menu.visible {
+  visibility: visible; /* 메뉴 보이게 하기 */
+  opacity: 1;
+  transition: opacity 0.3s ease; /* 애니메이션 속도 */
+}
+
+.dropdown-item {
+  display: flex; /* flexbox로 정렬 */
+  align-items: center; /* 수직 중앙 정렬 */
+  justify-content: center; /* 수평 중앙 정렬 */
+  padding: 0.8rem 1rem;
+  color: #333;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+  color: #007bff;
+}

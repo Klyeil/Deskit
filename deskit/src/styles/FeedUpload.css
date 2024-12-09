@@ -1,0 +1,49 @@
+/* src/styles/FeedUpload.css */
+.feed-upload-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .feed-upload-container h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .feed-upload-container form div {
+    margin-bottom: 1rem;
+  }
+  
+  .feed-upload-container label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .feed-upload-container input,
+  .feed-upload-container textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .feed-upload-container button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #007bff;
+    color: white;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .feed-upload-container button:disabled {
+    background-color: #ccc;
+  }
+  

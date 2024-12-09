@@ -1,23 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaRegUser, FaRegBookmark } from "react-icons/fa";
-import { FiUpload } from "react-icons/fi";
+import { FaRegUser } from 'react-icons/fa';
+import { FiUpload, FiShoppingCart } from 'react-icons/fi';
 import '../styles/Navbar.css';
 
 function Navbar() {
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // 로그인 상태 확인 (JWT 토큰 존재 여부로 판단)
   const isLoggedIn = localStorage.getItem('token') !== null;
 
-  const handleUserClick = () => {
-    if (isLoggedIn) {
-      // 로그인 상태라면 프로필 페이지로 이동
-      navigate('/profile');
-    } else {
-      // 로그인하지 않았다면 로그인 페이지로 이동
-      navigate('/login');
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile'); // 아이콘 클릭 시 프로필 페이지로 이동
   };
 
   return (
@@ -25,13 +24,34 @@ function Navbar() {
       <Link to="/" className="logo">Deskit</Link>
       <div className="nav-links">
         <Link to="/upload" className="nav-link">
-            <FiUpload size={23} />
+          <FiUpload size={23} />
         </Link>
-        <Link to="/bookmark" className="nav-link">
-            <FaRegBookmark size={23} />
+        <Link to="/cart" className="nav-link">
+          <FiShoppingCart size={23} />
         </Link>
-        <div className="nav-link" onClick={handleUserClick}>
-            <FaRegUser size={22} />
+        <div
+          className="nav-link user-icon"
+          onMouseEnter={() => setShowUserMenu(true)}
+          onMouseLeave={() => setShowUserMenu(false)}
+        >
+          <FaRegUser size={22} onClick={handleProfileClick} /> {/* 아이콘 클릭 시 프로필로 이동 */}
+          <div
+            className={`dropdown-menu ${showUserMenu ? 'visible' : ''}`}
+            onMouseEnter={() => setShowUserMenu(true)}  // 메뉴로 마우스 올리면 메뉴 보이게 설정
+            onMouseLeave={() => setShowUserMenu(false)} // 메뉴 밖으로 나가면 메뉴 숨기기
+          >
+            {isLoggedIn ? (
+              <>
+                <div className="dropdown-item" onClick={() => navigate('/settings')}>설정</div>
+                <div className="dropdown-item" onClick={handleLogout}>로그아웃</div>
+              </>
+            ) : (
+              <>
+                <div className="dropdown-item" onClick={() => navigate('/login')}>로그인</div>
+                <div className="dropdown-item" onClick={() => navigate('/signup')}>회원가입</div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>

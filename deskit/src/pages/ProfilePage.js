@@ -1,30 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../styles/ProfilePage.css';
-import { MdLogout } from "react-icons/md";
-import { IoSettingsOutline } from "react-icons/io5";
-import { FaRegUser } from "react-icons/fa";
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    nickname: '',
-    email: '',
-    birthday: '',
-    address: '',
-  });
-  const [profileImagePreview, setProfileImagePreview] = useState('');
-  const [profileImageFile, setProfileImageFile] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [feeds, setFeeds] = useState([]);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // useNavigate 훅 추가
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem('token');
-
       if (!token) {
         setError('로그인이 필요합니다.');
         return;
@@ -34,199 +21,102 @@ function ProfilePage() {
         const response = await axios.get('http://localhost:3001/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setUser(response.data);
-        setFormData({
-          name: response.data.name,
-          nickname: response.data.nickname,
-          email: response.data.email,
-          birthday: response.data.birthday,
-          address: response.data.address,
-        });
-        setProfileImagePreview(response.data.profileImage || '');
       } catch (err) {
-        setError('사용자 정보를 가져오는 데 실패했습니다.');
+        console.error('사용자 정보 가져오기 실패:', err);
+        if (err.response && err.response.status === 401) {
+          alert('세션이 만료되었습니다. 다시 로그인하세요.');
+          localStorage.removeItem('token');
+          navigate('/login');
+        } else {
+          setError('사용자 정보를 가져오는 데 실패했습니다.');
+        }
+      }
+    };
+
+    const fetchUserFeeds = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('로그인이 필요합니다.');
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:3001/feeds', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFeeds(response.data);
+      } catch (err) {
+        console.error('피드 가져오기 실패:', err);
+        if (err.response && err.response.status === 401) {
+          alert('세션이 만료되었습니다. 다시 로그인하세요.');
+          localStorage.removeItem('token');
+          navigate('/login');
+        } else {
+          setFeeds([]);
+          setError('피드를 가져오는 데 실패했습니다.');
+        }
       }
     };
 
     fetchUserProfile();
-  }, []);
+    fetchUserFeeds();
+  }, [navigate]);
 
-  useEffect(() => {
-    if (error) {
-      alert(error);
-      navigate('/login');
-    }
-  }, [error, navigate]);
+  // 피드 업로드 후 피드 갱신을 위한 함수 추가
+  const addNewFeed = (newFeed) => {
+    setFeeds((prevFeeds) => [newFeed, ...prevFeeds]);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login');
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('이미지 크기는 5MB를 초과할 수 없습니다.');
-        return;
-      }
-      if (!file.type.startsWith('image/')) {
-        alert('이미지 파일만 업로드 가능합니다.');
-        return;
-      }
-      setProfileImageFile(file);
-
-      const reader = new FileReader();
-      reader.onloadend = () => setProfileImagePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-
-    const updatedData = new FormData();
-    Object.keys(formData).forEach((key) => {
-      updatedData.append(key, formData[key]);
-    });
-
-    if (profileImageFile) {
-      updatedData.append('profileImage', profileImageFile);
-    }
-
-    try {
-      const response = await axios.put('http://localhost:3001/profile/update', updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      setUser(response.data.user);
-      setProfileImagePreview(response.data.user.profileImage);
-      setIsEditing(false);
-      alert('프로필이 성공적으로 업데이트되었습니다.');
-    } catch (error) {
-      console.error('프로필 수정 오류:', error);
-      alert('프로필 수정에 실패했습니다.');
-    }
+    navigate('/login'); // useNavigate로 페이지 이동
   };
 
   return (
     <div className="profile-page">
-      <div className="sidebar">
-        <div className="sidebar-icon" onClick={() => navigate('/profile')}>
-          <FaRegUser size={24} />
-        </div>
-        <div className="sidebar-icon" onClick={() => navigate('/settings')}>
-          <IoSettingsOutline size={27} />
-        </div>
-        <div className="sidebar-icon" onClick={handleLogout}>
-          <MdLogout size={26} />
-        </div>
-      </div>
-
       <div className="profile-content">
+        {error && <p className="error-message">{error}</p>}
+
         {user ? (
           <div>
-            <h2>{user.name}님의 프로필</h2>
-            {isEditing ? (
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label>이름</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>닉네임</label>
-                  <input
-                    type="text"
-                    name="nickname"
-                    value={formData.nickname}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>이메일</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    disabled
-                  />
-                </div>
-                <div className="form-group">
-                  <label>생일</label>
-                  <input
-                    type="date"
-                    name="birthday"
-                    value={formData.birthday}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>주소</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>프로필 사진</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  {profileImagePreview && (
-                    <img
-                      src={profileImagePreview}
-                      alt="Profile Preview"
-                      className="profile-image-preview"
-                    />
-                  )}
-                </div>
-                <button type="submit" className="save-button">저장</button>
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => setIsEditing(false)}
-                >
-                  취소
-                </button>
-              </form>
-            ) : (
-              <div className="profile-info">
-                <p><strong>이름:</strong> {user.name}</p>
-                <p><strong>닉네임:</strong> {user.nickname}</p>
-                <p><strong>이메일:</strong> {user.email}</p>
-                <p><strong>생일:</strong> {user.birthday}</p>
-                <p><strong>주소:</strong> {user.address}</p>
-                {profileImagePreview && (
-                  <img
-                    src={profileImagePreview}
-                    alt="Profile"
-                    className="profile-image"
-                  />
-                )}
-                <button onClick={() => setIsEditing(true)}>수정</button>
-              </div>
-            )}
+            <div className="profile-header">
+              {user.profileImage ? (
+                <img
+                  src={`http://localhost:3001${user.profileImage}`}
+                  alt="Profile"
+                  className="profile-header-image"
+                />
+              ) : (
+                <div className="profile-placeholder">No Image</div>
+              )}
+              <h2 className="profile-header-nickname">{user.nickname}</h2>
+              <button
+                className="settings-btn"
+                onClick={() => navigate('/profile/verify-password')}
+              >
+                회원 정보 설정
+              </button>
+              <button className="logout-btn" onClick={handleLogout}>
+                로그아웃
+              </button>
+            </div>
+
+            <div className="feeds">
+              {feeds.length > 0 ? (
+                feeds.map((feed) => (
+                  <div
+                    key={feed._id}
+                    className="feed-item"
+                    onClick={() => navigate(`/feed/${feed._id}`)} // 피드 클릭 시 상세 페이지로 이동
+                  >
+                    <img src={feed.image} alt={feed.title} />
+                  </div>
+                ))
+              ) : (
+                <p>표시할 피드가 없습니다.</p>
+              )}
+            </div>
           </div>
         ) : (
           <p>로딩 중...</p>

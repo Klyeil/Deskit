@@ -8,6 +8,8 @@ const dotenv = require('dotenv');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const Feed = require('./models/Feed');
+
 
 // 환경 변수 로드
 dotenv.config();
@@ -16,15 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const SECRET_KEY = process.env.SECRET_KEY;  // 환경 변수에서 비밀 키 로드
 
-// Feed 모델 추가
-const FeedSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  image: { type: String, required: true },
-  title: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
 
-const Feed = mongoose.model('Feed', FeedSchema);
 
 
 // 이미지 저장 경로 초기화 (uploads 폴더 생성)
@@ -236,7 +230,7 @@ app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
   }
 });
 
-// 피드 라우트
+// 피드 가져오기 라우트 - 최신 순으로 정렬
 app.get('/feeds', async (req, res) => {
   const token = req.headers['authorization'];
   
@@ -248,8 +242,8 @@ app.get('/feeds', async (req, res) => {
     const tokenWithoutBearer = token.split(' ')[1];
     const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
 
-    // Feed 모델에서 사용자와 관련된 피드 조회
-    const feeds = await Feed.find({ userId: decoded.userId });
+    // Feed 모델에서 사용자와 관련된 피드를 createdAt 기준으로 최신 순 정렬
+    const feeds = await Feed.find({ userId: decoded.userId }).sort({ createdAt: -1 });
     res.json(feeds);
   } catch (error) {
     res.status(401).json({ message: 'Invalid or expired token' });
@@ -327,7 +321,7 @@ app.put('/settings', async (req, res) => {
   }
 });
 
-// 피드 업로드 라우트
+// 피드 업로드 라우트 - 업로드 후 최신 순으로 피드 반환
 app.post('/feeds/upload', upload.single('image'), async (req, res) => {
   const token = req.headers['authorization'];
 
@@ -349,6 +343,7 @@ app.post('/feeds/upload', upload.single('image'), async (req, res) => {
     // 절대 경로로 이미지 URL 설정
     const imageUrl = `http://localhost:3001/uploads/${req.file.filename}`;
 
+    // 새로운 피드 생성
     const newFeed = new Feed({
       userId,
       title,
@@ -358,7 +353,7 @@ app.post('/feeds/upload', upload.single('image'), async (req, res) => {
 
     await newFeed.save();
 
-    // 업로드 후 새 피드를 포함한 피드 목록 응답
+    // 업로드 후 새 피드를 포함한 피드 목록을 최신 순으로 반환
     const feeds = await Feed.find({ userId: decoded.userId }).sort({ createdAt: -1 });
 
     res.status(201).json({ message: 'Feed uploaded successfully!', feeds });

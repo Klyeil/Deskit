@@ -10,16 +10,12 @@ const path = require('path');
 const fs = require('fs');
 const Feed = require('./models/Feed');
 
-
 // 환경 변수 로드
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const SECRET_KEY = process.env.SECRET_KEY;  // 환경 변수에서 비밀 키 로드
-
-
-
 
 // 이미지 저장 경로 초기화 (uploads 폴더 생성)
 const uploadPath = path.join(__dirname, 'uploads');
@@ -30,11 +26,11 @@ if (!fs.existsSync(uploadPath)) {
 // Middleware
 app.use(cors({
   origin: 'http://localhost:3000',
-  credentials: true,
-  allowedHeaders: ['Authorization', 'Content-Type']
+  credentials: true,  // 클라이언트에서 쿠키나 인증 정보를 보내는 것을 허용
+  allowedHeaders: ['Authorization', 'Content-Type'],
 }));
 app.use(bodyParser.json());
-app.use('/uploads', express.static(uploadPath));
+app.use('/uploads', express.static(uploadPath));  // 파일 경로 설정
 
 // MongoDB 연결
 mongoose.connect(process.env.MONGO_URI)
@@ -45,7 +41,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log('MongoDB connection error:', err);
   });
 
-// 사용자 모델 정의 (이름, 생일, 주소 추가)
+// 사용자 모델 정의
 const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -70,14 +66,12 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // 비밀번호 비교
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // JWT 토큰 생성
         const token = jwt.sign({ email: user.email, userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
 
         res.status(200).json({ token, message: 'Login successful!' });
@@ -91,27 +85,23 @@ app.post('/signup', async (req, res) => {
     const { email, password, name, nickname, birthday, address } = req.body;
 
     try {
-        // 필수 필드 검사
+        // 필수 피드 검사
         if (!email || !password || !name || !nickname || !birthday || !address) {
             return res.status(400).json({ message: 'All fields are required' });
         }
-
         // 이미 이메일이 존재하는지 확인
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: '이미 존재하는 이메일입니다.' });
         }
-
         // 닉네임 중복 검사
         const existingUserByNickName = await User.findOne({ nickname });
         if (existingUserByNickName) {
             return res.status(400).json({ message: '이미 존재하는 사용자명입니다.' });
         }
-
         // 비밀번호 해싱
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // 새 사용자 저장
+        // 새 사용자 지정
         const newUser = new User({
             email,
             password: hashedPassword,
@@ -121,8 +111,7 @@ app.post('/signup', async (req, res) => {
             address,
         });
         await newUser.save();
-
-        // JWT 토큰 생성
+        //JWT 토큰 생성
         const token = jwt.sign({ email: newUser.email, userId: newUser._id }, SECRET_KEY, { expiresIn: '1h' });
 
         res.status(201).json({ token, message: 'Signup successful!' });
@@ -131,7 +120,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-// 사용자 프로필 라우트 (인증된 사용자만 접근)
+// 사용자 프로필 라우트
 app.get('/profile', async (req, res) => {
     const token = req.headers['authorization'];
 
@@ -141,10 +130,8 @@ app.get('/profile', async (req, res) => {
 
     try {
         const tokenWithoutBearer = token.split(' ')[1];
-        // JWT 토큰 검증
         const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
 
-        // 사용자 정보 조회
         const user = await User.findById(decoded.userId);
 
         if (!user) {
@@ -173,14 +160,14 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // 파일명에 타임스탬프 추가
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
 // multer 설정
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 최대 5MB
+  limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('이미지 파일만 업로드 가능합니다.'));
@@ -189,9 +176,10 @@ const upload = multer({
   }
 });
 
-// 프로필 업데이트 라우트 (이미지 파일 처리 추가)
+// 프로필 업데이트 라우트 ( 이미지 파일 처리 추가 )
 app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
   const token = req.headers['authorization'];
+
   if (!token) {
     return res.status(403).json({ message: 'No token provided' });
   }
@@ -216,24 +204,17 @@ app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
 
     res.json({
       message: 'Profile updated successfully!',
-      user: {
-        name: updatedUser.name,
-        nickname: updatedUser.nickname,
-        email: updatedUser.email,
-        birthday: updatedUser.birthday.toISOString().split('T')[0],
-        address: updatedUser.address,
-        profileImage: updatedUser.profileImage,
-      }
+      user: updatedUser,
     });
   } catch (error) {
     res.status(500).json({ message: '프로필 업데이트 실패', error });
   }
 });
 
-// 피드 가져오기 라우트 - 최신 순으로 정렬
+// 피드 가져오기 라우트
 app.get('/feeds', async (req, res) => {
   const token = req.headers['authorization'];
-  
+
   if (!token) {
     return res.status(403).json({ message: 'No token provided' });
   }
@@ -242,11 +223,48 @@ app.get('/feeds', async (req, res) => {
     const tokenWithoutBearer = token.split(' ')[1];
     const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
 
-    // Feed 모델에서 사용자와 관련된 피드를 createdAt 기준으로 최신 순 정렬
     const feeds = await Feed.find({ userId: decoded.userId }).sort({ createdAt: -1 });
     res.json(feeds);
   } catch (error) {
     res.status(401).json({ message: 'Invalid or expired token' });
+  }
+});
+
+// 피드 업로드 라우트
+app.post('/feeds/upload', upload.single('image'), async (req, res) => {
+  const token = req.headers['authorization'];
+
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  try {
+    const tokenWithoutBearer = token.split(' ')[1];
+    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+
+    const { title, description } = req.body;
+    const userId = decoded.userId;
+
+    if (!title || !req.file) {
+      return res.status(400).json({ message: 'Title and image are required' });
+    }
+
+    const imageUrl = `http://localhost:3001/uploads/${req.file.filename}`;
+
+    const newFeed = new Feed({
+      userId,
+      title,
+      description,
+      image: imageUrl,
+    });
+
+    await newFeed.save();
+
+    const feeds = await Feed.find({ userId: decoded.userId }).sort({ createdAt: -1 });
+
+    res.status(201).json({ message: 'Feed uploaded successfully!', feeds });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
   }
 });
 
@@ -286,7 +304,6 @@ app.post('/verify-password', async (req, res) => {
   }
 });
 
-
 // 회원 정보 설정 라우트
 app.put('/settings', async (req, res) => {
   const { name, nickname, birthday, address } = req.body;
@@ -321,47 +338,19 @@ app.put('/settings', async (req, res) => {
   }
 });
 
-// 피드 업로드 라우트 - 업로드 후 최신 순으로 피드 반환
-app.post('/feeds/upload', upload.single('image'), async (req, res) => {
-  const token = req.headers['authorization'];
-
-  if (!token) {
-    return res.status(403).json({ message: 'No token provided' });
-  }
-
+// 특정 피드 상세 정보 API
+app.get('/feeds/:feedId', async (req, res) => {
   try {
-    const tokenWithoutBearer = token.split(' ')[1];
-    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
-
-    const { title, description } = req.body;
-    const userId = decoded.userId;
-
-    if (!title || !req.file) {
-      return res.status(400).json({ message: 'Title and image are required' });
+    const feed = await Feed.findById(req.params.feedId);
+    if (!feed) {
+      return res.status(404).json({ message: '피드를 찾을 수 없습니다.' });
     }
-
-    // 절대 경로로 이미지 URL 설정
-    const imageUrl = `http://localhost:3001/uploads/${req.file.filename}`;
-
-    // 새로운 피드 생성
-    const newFeed = new Feed({
-      userId,
-      title,
-      description,
-      image: imageUrl,  // 절대 경로로 저장된 이미지 URL
-    });
-
-    await newFeed.save();
-
-    // 업로드 후 새 피드를 포함한 피드 목록을 최신 순으로 반환
-    const feeds = await Feed.find({ userId: decoded.userId }).sort({ createdAt: -1 });
-
-    res.status(201).json({ message: 'Feed uploaded successfully!', feeds });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.json(feed);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류' });
   }
 });
-
 
 
 // 서버 시작

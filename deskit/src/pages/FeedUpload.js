@@ -9,6 +9,7 @@ function FeedUpload() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // 이미지 파일 선택 처리
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -16,8 +17,11 @@ function FeedUpload() {
     }
   };
 
+  // 피드 업로드 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 필수 필드 확인
     if (!image || !title || !description) {
       alert('모든 필드를 채워주세요.');
       return;
@@ -25,28 +29,30 @@ function FeedUpload() {
 
     setLoading(true);
 
+    // FormData 객체 생성
     const formData = new FormData();
     formData.append('image', image);
     formData.append('title', title);
     formData.append('description', description);
 
     try {
+      // 피드 업로드 API 호출
       const response = await axios.post('http://localhost:3001/feeds/upload', formData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // 토큰 헤더에 추가
           'Content-Type': 'multipart/form-data',
         },
       });
 
+      // 업로드 성공 시 프로필 페이지로 리다이렉트
       if (response.status === 201) {
-        // 업로드 성공 후 프로필 페이지로 리다이렉트
         navigate('/profile');
       }
     } catch (error) {
       console.error('피드 업로드 실패', error.response || error.message);
       alert('피드 업로드에 실패했습니다.');
     } finally {
-      setLoading(false);
+      setLoading(false); // 로딩 상태 종료
     }
   };
 

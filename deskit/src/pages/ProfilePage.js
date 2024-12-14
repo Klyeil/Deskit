@@ -7,8 +7,9 @@ function ProfilePage() {
   const [user, setUser] = useState(null);
   const [feeds, setFeeds] = useState([]);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // useNavigate 훅 추가
+  const navigate = useNavigate();
 
+  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem('token');
@@ -34,6 +35,11 @@ function ProfilePage() {
       }
     };
 
+    fetchUserProfile();
+  }, [navigate]);
+
+  // 사용자 피드 가져오기
+  useEffect(() => {
     const fetchUserFeeds = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -59,18 +65,13 @@ function ProfilePage() {
       }
     };
 
-    fetchUserProfile();
     fetchUserFeeds();
   }, [navigate]);
 
-  // 피드 업로드 후 피드 갱신을 위한 함수 추가
-  const addNewFeed = (newFeed) => {
-    setFeeds((prevFeeds) => [newFeed, ...prevFeeds]);
-  };
-
+  // 로그아웃 함수
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login'); // useNavigate로 페이지 이동
+    navigate('/login');
   };
 
   return (
@@ -108,9 +109,13 @@ function ProfilePage() {
                   <div
                     key={feed._id}
                     className="feed-item"
-                    onClick={() => navigate(`/feed/${feed._id}`)} // 피드 클릭 시 상세 페이지로 이동
+                    onClick={() => navigate(`/feed/${feed._id}`)}
                   >
-                    <img src={feed.image} alt={feed.title} />
+                    <img
+                      src={feed.image}
+                      alt={feed.title}
+                      className="feed-image"
+                    />
                   </div>
                 ))
               ) : (

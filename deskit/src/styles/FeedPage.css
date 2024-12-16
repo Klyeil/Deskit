@@ -1,0 +1,161 @@
+/* 전체 페이지에서 스크롤을 막음 */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;  /* 전체 페이지 스크롤 비활성화 */
+  }
+
+/* src/pages/FeedPage.css */
+.feed-page-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f3f3f3;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+
+  /* 사이드바 컨테이너 스타일 */
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 270px;
+    height: 100vh;
+    gap: 20px; /* 사이드바와 버튼 사이 여백 */
+    margin-left: 50px;
+  }
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+  
+  /* 사이드바 스타일 */
+  .sidebar {
+    width: 270px;
+    height: 60vh;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-left: 50px;
+    margin-top: 80px;
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;  /* 프로필과 메뉴 사이에 충분한 여백 추가 */
+  }
+
+  
+  .profile-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .user-info .user-name {
+    font-size: 17px;
+    font-weight: bold;
+    color: black;
+    margin-left: 8px;
+  }
+  .user-info .user-username {
+    color: black;
+    margin-top: -10px;
+    margin-left: 8px;
+  }
+
+
+  .sidebar-nav .nav-item {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 12px 20px;
+    font-size: 18px;
+    color: #555;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.2s;
+    border-radius: 8px;
+  }
+  
+  .sidebar-nav .nav-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+
+
+/* 피드 업로드 버튼 스타일 */
+.upload-feed {
+    width: 100%;
+  }
+
+  .upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #7655E3;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    width: 117%;
+    height: 150%;
+    margin-left: 3px;
+  }
+
+  .upload-btn:hover {
+    background-color: #7655E3;
+  }
+  
+
+  
+  
+/* 메인 피드 스타일 */
+    /* 메인 피드 영역에서만 스크롤을 허용 */
+.feed-content {
+    width: 1000px;  /* 고정된 너비 설정 */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;  /* 메인 피드 영역에서만 스크롤 활성화 */
+    max-height: 80vh;  /* 최대 높이를 화면의 80%로 설정 (필요에 따라 조정) */
+    margin-left: 170px;  /* 오른쪽으로 이동 */
+    overflow-y : auto;
+  }
+  
+  .feed-content::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .feed-header {
+    margin-bottom: 20px;
+  }
+  
+  .feed-items {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .feed-item {
+    width: 80%;
+  }
+  
+  .feed-image {
+    width: 100%;
+    border-radius: 12px;
+  }
+  
+
+  

@@ -1,0 +1,32 @@
+.feed-detail-page {
+    padding: 20px;
+    background-color: #f3f3f3;
+    min-height: 100vh;
+  }
+  
+  .feed-detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .feed-detail-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .feed-detail-image {
+    width: 100%;
+    border-radius: 12px;
+  }
+  
+  .feed-description {
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  

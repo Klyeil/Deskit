@@ -9,7 +9,6 @@ function ProfilePage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem('token');
@@ -38,7 +37,6 @@ function ProfilePage() {
     fetchUserProfile();
   }, [navigate]);
 
-  // 사용자 피드 가져오기
   useEffect(() => {
     const fetchUserFeeds = async () => {
       const token = localStorage.getItem('token');
@@ -68,10 +66,13 @@ function ProfilePage() {
     fetchUserFeeds();
   }, [navigate]);
 
-  // 로그아웃 함수
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const goToFeedDetail = (feedId) => {
+    navigate(`/feed-detail/${feedId}`);
   };
 
   return (
@@ -109,7 +110,7 @@ function ProfilePage() {
                   <div
                     key={feed._id}
                     className="feed-item"
-                    onClick={() => navigate(`/feed/${feed._id}`)}
+                    onClick={() => goToFeedDetail(feed._id)}
                   >
                     <img
                       src={feed.image}

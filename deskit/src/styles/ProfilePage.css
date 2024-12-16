@@ -25,6 +25,7 @@ body {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  margin-left: -50px;
 }
 
 .profile-header-image {
@@ -43,22 +44,21 @@ body {
 }
 
 .settings-btn {
-  background-color: #007bff;
+  background-color: #7655E3;
   color: white;
   border: none;
   padding: 8px 16px;
   cursor: pointer;
   border-radius: 4px;
   font-size: 14px;
-  margin-left: 10px;
-  transition: background-color 0.3s ease;
+  margin-left: 30px;
   max-width: 200px;
   width: auto;
   min-width: 100px;
 }
 
 .settings-btn:hover {
-  background-color: #0056b3;
+  background-color: #7655E3;
 }
 
 .logout-btn {
@@ -79,28 +79,32 @@ body {
 }
 
 
+/* .feeds 컨테이너 */
 .feeds {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px; /* 사진들 간의 간격 */
-  justify-content: flex-center; /* 가운데 정렬 */
-  padding: 20px; /* 여백 */
+  gap: 16px;  /* 사진들 간의 간격 */
+  justify-content: flex-start;  /* 가운데 정렬 */
+  padding: 20px;  /* 여백 */
+  width: 100%;  /* 부모 요소의 너비 100% */
+  margin-left: -35px;
 }
 
 .feed-item {
-  width: calc(30% - 16px); /* 한 줄에 3개 피드 */
+  flex-basis: calc(33.333% - 16px);  /* 한 줄에 3개 */
   height: 300px;
-  margin-bottom: 16px; /* 사진 아래 여백 */
+  margin-bottom: 16px;  /* 사진 아래 여백 */
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feed-item img {
   width: 100%; /* 이미지가 부모 요소의 너비를 채움 */
-  height: 100%; /* 이미지 비율을 유지 */
+  height: auto; /* 이미지 비율을 유지 */
   object-fit: cover; /* 이미지가 비율을 유지하며 꽉 차게 */
+  border-radius: 0;
 }
+
 
 
 /* 에러 및 로딩 메시지 스타일 */

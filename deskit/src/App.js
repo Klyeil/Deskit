@@ -11,7 +11,9 @@ import PasswordCheckPage from './pages/PasswordCheckPage';
 import ProfileSettingsPage from './pages/ProfileSettingPage';
 import SiteSettingsPage from './pages/SiteSettingsPage';
 import FeedUpload from './pages/FeedUpload';
-import FeedDetail from './pages/FeedDetail';
+import FeedPage from './pages/FeedPage';
+import FeedDetailPage from './pages/FeedDetailPage';
+
 
 
 function App() {
@@ -27,7 +29,8 @@ function App() {
         <Route path="/profile/settings" element={<ProfileSettingsPage />} />
         <Route path="/settings" element={<SiteSettingsPage />} />
         <Route path="/upload" element={<FeedUpload />} />
-        <Route path="/feed/:feedId" element={<FeedDetail />} />
+        <Route path="/feeds" element={<FeedPage />} />
+        <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
 
 
       </Routes>

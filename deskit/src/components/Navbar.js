@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaRegUser } from 'react-icons/fa';
-import { FiUpload, FiShoppingCart } from 'react-icons/fi';
+import { FiShoppingCart } from 'react-icons/fi';
+import { MdDynamicFeed } from "react-icons/md";
 import '../styles/Navbar.css';
 
 function Navbar() {
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
   const isLoggedIn = localStorage.getItem('token') !== null;
 
   const handleLogout = () => {
@@ -19,12 +20,33 @@ function Navbar() {
     navigate('/profile'); // 아이콘 클릭 시 프로필 페이지로 이동
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    if (searchQuery) {
+      navigate('/search?query=${searchQuery}');
+    }
+  };
+
   return (
     <nav className="navbar">
       <Link to="/" className="logo">Deskit</Link>
+      {/* 검색창 추가 */}
+      <form className="search-form" onSubmit={handleSearchSubmit}>
+          <input
+            type="text"
+            placeholder="검색..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+        </form>
       <div className="nav-links">
-        <Link to="/upload" className="nav-link">
-          <FiUpload size={23} />
+      <Link to="/feeds" className="nav-link">
+          <MdDynamicFeed size={25} />
         </Link>
         <Link to="/cart" className="nav-link">
           <FiShoppingCart size={23} />

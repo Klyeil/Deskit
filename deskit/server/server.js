@@ -230,6 +230,42 @@ app.get('/feeds', async (req, res) => {
   }
 });
 
+// 피드 상세 정보 API
+app.get('/feeds/:feedId', async (req, res) => {
+  try {
+    const feed = await Feed.findById(req.params.feedId);  // 피드 ID로 찾기
+    if (!feed) {
+      return res.status(404).json({ message: '피드를 찾을 수 없습니다.' });
+    }
+    res.json(feed);  // 피드 상세 정보 반환
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+// 사용자 ID로 피드 가져오기
+app.get('/feeds/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    // userId를 mongoose.Types.ObjectId로 변환
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // userId가 맞는 피드를 찾기
+    const feeds = await Feed.find({ userId: userObjectId }).sort({ createdAt: -1 });
+
+    if (!feeds || feeds.length === 0) {
+      return res.status(404).json({ message: '피드를 찾을 수 없습니다.' });
+    }
+
+    res.json(feeds);
+  } catch (error) {
+    console.error('Error fetching feeds:', error);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+
 // 피드 업로드 라우트
 app.post('/feeds/upload', upload.single('image'), async (req, res) => {
   const token = req.headers['authorization'];
@@ -338,17 +374,38 @@ app.put('/settings', async (req, res) => {
   }
 });
 
-// 특정 피드 상세 정보 API
-app.get('/feeds/:feedId', async (req, res) => {
+
+// 피드 가져오기 라우트 (페이지네이션 추가)
+app.get('/feeds', async (req, res) => {
+  const token = req.headers['authorization'];
+
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
   try {
-    const feed = await Feed.findById(req.params.feedId);
-    if (!feed) {
-      return res.status(404).json({ message: '피드를 찾을 수 없습니다.' });
-    }
-    res.json(feed);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: '서버 오류' });
+    const tokenWithoutBearer = token.split(' ')[1];
+    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+
+    // 쿼리에서 페이지 번호와 페이지당 항목 수 받기 (기본값 설정)
+    const page = parseInt(req.query.page) || 1;  // 기본 페이지 번호 1
+    const limit = parseInt(req.query.limit) || 10;  // 페이지당 항목 수 10
+
+    const feeds = await Feed.find({ userId: decoded.userId })
+                            .sort({ createdAt: -1 })
+                            .skip((page - 1) * limit)  // 페이지 스킵
+                            .limit(limit);  // 제한된 개수만 가져오기
+
+    // 총 피드 수 계산
+    const totalFeeds = await Feed.countDocuments({ userId: decoded.userId });
+
+    res.json({
+      feeds,
+      totalPages: Math.ceil(totalFeeds / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 });
 

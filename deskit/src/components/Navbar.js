@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaRegUser } from 'react-icons/fa';
+import { FaRegUser, FaWifi } from 'react-icons/fa';
 import { FiShoppingCart } from 'react-icons/fi';
-import { MdDynamicFeed } from "react-icons/md";
 import '../styles/Navbar.css';
 
 function Navbar() {
@@ -46,7 +45,7 @@ function Navbar() {
         </form>
       <div className="nav-links">
       <Link to="/feeds" className="nav-link">
-          <MdDynamicFeed size={25} />
+          <FaWifi size={25} />
         </Link>
         <Link to="/cart" className="nav-link">
           <FiShoppingCart size={23} />

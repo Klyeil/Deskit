@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { useUser } from '../context/UserContext';
+import { FiBookmark } from 'react-icons/fi';
 import '../styles/FeedDetailPage.css';
 
 const FeedDetailPage = () => {
-  const { feedId } = useParams(); // URL 파라미터에서 feedId를 가져옴
+  const { feedId } = useParams();
+  const { user, loading: userLoading } = useUser(); // 사용자 데이터와 로딩 상태
   const [feed, setFeed] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [liked, setLiked] = useState(false); // 좋아요 상태
+  const [saved, setSaved] = useState(false); // 저장 상태
 
   useEffect(() => {
-    console.log(`Fetching feed with feedId: ${feedId}`); // feedId가 올바르게 전달되는지 확인
     const fetchFeedDetail = async () => {
-      if (!feedId) {
-        console.error('Feed ID is missing');
-        setLoading(false);
-        return;
-      }
       try {
         const response = await fetch(`http://localhost:3001/feeds/${feedId}`);
         if (response.ok) {
           const data = await response.json();
-          console.log('API Response:', data); // 응답 확인
-          setFeed(data); // 피드 상세 정보 저장
+          setFeed(data);
         } else {
           console.error('Failed to fetch feed detail');
         }
@@ -32,30 +31,82 @@ const FeedDetailPage = () => {
     };
 
     fetchFeedDetail();
-  }, [feedId]); // feedId가 변경될 때마다 새로 호출
+  }, [feedId]);
 
-  // feed 상태가 변경될 때마다 콘솔에 출력
-  useEffect(() => {
-    if (feed !== null) {
-      console.log('Fetched feed:', feed); // 상태 업데이트 후 feed가 잘 저장되었는지 확인
-    }
-  }, [feed]); // feed 상태가 변경될 때마다 실행
+  // 좋아요 버튼 클릭 핸들러
+  const handleLike = () => {
+    setLiked(!liked);
+  };
+
+  // 저장 버튼 클릭 핸들러
+  const handleSave = () => {
+    setSaved(!saved);
+  };
 
   return (
     <div className="feed-detail-page">
-      {loading ? (
+      {loading || userLoading ? (
         <p>Loading...</p>
-      ) : (
+      ) : feed ? (
         <div className="feed-detail-container">
-          {feed ? (
-            <div className="feed-detail-item">
-              <img src={feed.image} alt="Feed" className="feed-detail-image" />
-              <p className="feed-description">{feed.description}</p>
-            </div>
-          ) : (
-            <p>Feed not found</p>
-          )}
+          {/* 헤더: 사용자 정보 */}
+          <div className="feed-header">
+             <div className="user-info">
+                {user && user.profileImage ? (
+                <img
+                     src={`http://localhost:3001${user.profileImage}`}
+                     alt="Profile"
+                     className="user-profile-image"
+                />
+                ) : (
+            <div className="profile-placeholder">No Image</div>
+                )}
+            <span className="user-nickname">
+            @ {user ? user.nickname : 'Unknown User'}
+            </span>
+            
+          </div>
         </div>
+
+
+          {/* 이미지 섹션 */}
+          <div className="feed-image-section">
+            <img src={feed.image} alt="Desk Setup" className="feed-main-image" />
+          </div>
+
+          {/* 좋아요 및 저장 아이콘 */}
+          <div className="feed-actions">
+            <div className="like-icon" onClick={handleLike}>
+              {liked ? <AiFillHeart color="#7655E3" size={24} /> : <AiOutlineHeart color="gray" size={24} />}
+            </div>
+            <div className="save-icon" onClick={handleSave}>
+            <FiBookmark color={saved ? "#7655E3" : "gray"} size={24} /> {/* saved 상태에 따라 색상 변경 */}
+            </div>
+          </div>
+
+          {/* 설명 섹션 */}
+          <div className="feed-description-section">
+            <p className="feed-description">{feed.description || 'No description provided.'}</p>
+          </div>
+
+          {/* 제품 정보 섹션 */}
+          <div className="product-info-section">
+            <h3>📋 사용된 제품 정보</h3>
+            <ul>
+              {feed.products && feed.products.length > 0 ? (
+                feed.products.map((product, index) => (
+                  <li key={index} className="product-item">
+                    <span>{product.name}</span> - <a href={product.link} target="_blank" rel="noopener noreferrer">구매 링크</a>
+                  </li>
+                ))
+              ) : (
+                <p>제품 정보가 없습니다.</p>
+              )}
+            </ul>
+          </div>
+        </div>
+      ) : (
+        <p>Feed not found</p>
       )}
     </div>
   );

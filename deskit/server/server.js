@@ -176,6 +176,39 @@ const upload = multer({
   }
 });
 
+// 현재 사용자 정보 가져오기 라우트
+app.get('/user/me', async (req, res) => {
+  const token = req.headers['authorization'];
+
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  try {
+    const tokenWithoutBearer = token.split(' ')[1];
+    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      nickname: user.nickname,
+      email: user.email,
+      birthday: user.birthday,
+      address: user.address,
+      profileImage: user.profileImage,
+    });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid or expired token' });
+  }
+});
+
+
 // 프로필 업데이트 라우트 ( 이미지 파일 처리 추가 )
 app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
   const token = req.headers['authorization'];
@@ -322,7 +355,6 @@ app.post('/verify-password', async (req, res) => {
 
     const user = await User.findById(decoded.userId);
     if (!user) {
-      console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 

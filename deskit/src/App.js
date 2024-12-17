@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css'; // 스타일 추가
 import { Routes, Route } from 'react-router-dom';
+import { UserProvider } from './context/UserContext';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -18,6 +19,7 @@ import FeedDetailPage from './pages/FeedDetailPage';
 
 function App() {
   return (
+    <UserProvider>
     <div className="App">
       <Navbar />
       <Routes>
@@ -31,11 +33,10 @@ function App() {
         <Route path="/upload" element={<FeedUpload />} />
         <Route path="/feeds" element={<FeedPage />} />
         <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
-
-
       </Routes>
       <Footer />  {/* Footer 추가 */}
     </div>
+    </UserProvider>
   );
 }
 

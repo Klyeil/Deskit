@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ProfilePage.css';
+import { Link } from 'react-router-dom';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [feeds, setFeeds] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+
+  
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -92,7 +96,7 @@ function ProfilePage() {
               ) : (
                 <div className="profile-placeholder">No Image</div>
               )}
-              <h2 className="profile-header-nickname">{user.nickname}</h2>
+              <h2 className="profile-header-nickname">@{user.nickname}</h2>
               <button
                 className="settings-btn"
                 onClick={() => navigate('/profile/verify-password')}

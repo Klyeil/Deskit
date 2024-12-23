@@ -34,6 +34,7 @@ function SignUpPage() {
       nickname,
       birthday,
       address: `${address} ${addressDetail}`,
+      role: 'user'
     };
 
     try {

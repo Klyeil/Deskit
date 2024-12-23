@@ -29,6 +29,7 @@ export const UserProvider = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log(data);  // 사용자 데이터 출력
           setUser(data);  // 사용자 데이터 업데이트
         } else {
           console.error('Failed to fetch user data');

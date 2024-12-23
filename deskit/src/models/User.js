@@ -6,9 +6,14 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   name : { type: String, required: true },
+  nickname: { type: String, required: true, unique: true }, // 추가된 필드
   birthday: { type: String, required: true },
-  address: { type: String, required: true }
-});
+  address: { type: String, required: true },
+  role : { 
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user' }
+}, { timestamps: true });
 
 // 비밀번호를 저장하기 전에 해시화하는 함수
 userSchema.pre('save', async function (next) {

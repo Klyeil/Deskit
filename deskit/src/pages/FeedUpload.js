@@ -7,7 +7,6 @@ function FeedUpload() {
   const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
   // 이미지 파일 선택 처리
@@ -23,7 +22,7 @@ function FeedUpload() {
     e.preventDefault();
 
     // 필수 필드 확인
-    if (!image || !title || !description) {
+    if (!image || !title) {
       alert('모든 필드를 채워주세요.');
       return;
     }
@@ -34,13 +33,12 @@ function FeedUpload() {
     const formData = new FormData();
     formData.append('image', image);
     formData.append('title', title);
-    formData.append('description', description);
 
     try {
       // 피드 업로드 API 호출
       const response = await axios.post('http://localhost:3001/feeds/upload', formData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // 토큰 헤더에 추가
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data',
         },
       });
@@ -63,7 +61,7 @@ function FeedUpload() {
       <form onSubmit={handleSubmit}>
         <div>
           <label>이미지 업로드:</label>
-          <input type="file" onChange={handleImageChange} />
+          <input type="file" onChange={handleImageChange} required />
         </div>
         <div>
           <label>제목:</label>
@@ -71,14 +69,6 @@ function FeedUpload() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>설명:</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
             required
           />
         </div>

@@ -41,83 +41,156 @@ mongoose.connect(process.env.MONGO_URI)
     console.log('MongoDB connection error:', err);
   });
 
-// 사용자 모델 정의
+// 사용자 모델 정의 (role 필드 추가)
 const UserSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    name: { type: String, required: true },
-    nickname: { type: String, required: true },
-    birthday: { type: Date, required: true },
-    address: { type: String, required: true },
-    profileImage: { type: String },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  nickname: { type: String, required: true },
+  birthday: { type: Date, required: true },
+  address: { type: String, required: true },
+  profileImage: { type: String },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },  // 기본값 'user'
 });
 
 const User = mongoose.model('User', UserSchema);
 
+// 역할 검사 미들웨어
+const verifyRole = (roles) => {
+return (req, res, next) => {
+  const token = req.headers['authorization'];
+
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  try {
+    const tokenWithoutBearer = token.split(' ')[1];
+    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+
+    if (!roles.includes(decoded.role)) {
+      return res.status(403).json({ message: 'Access denied, insufficient role' });
+    }
+
+    req.user = decoded;  // decoded 정보를 후속 요청에 사용하기 위해 저장
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid or expired token' });
+  }
+};
+};
+
 // 로그인 라우트
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    try {
-        // 이메일로 사용자 찾기
-        const user = await User.findOne({ email });
+  try {
+      const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
+      if (!user) {
+          return res.status(401).json({ message: 'Invalid email or password' });
+      }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, user.password);
 
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
+      if (!isMatch) {
+          return res.status(401).json({ message: 'Invalid email or password' });
+      }
 
-        const token = jwt.sign({ email: user.email, userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
+      const token = jwt.sign({ email: user.email, userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
 
-        res.status(200).json({ token, message: 'Login successful!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
+      res.status(200).json({ token, message: 'Login successful!' });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+  }
 });
 
 // 회원가입 라우트
 app.post('/signup', async (req, res) => {
-    const { email, password, name, nickname, birthday, address } = req.body;
+const { email, password, name, nickname, birthday, address, role } = req.body;
 
-    try {
-        // 필수 피드 검사
-        if (!email || !password || !name || !nickname || !birthday || !address) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
-        // 이미 이메일이 존재하는지 확인
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: '이미 존재하는 이메일입니다.' });
-        }
-        // 닉네임 중복 검사
-        const existingUserByNickName = await User.findOne({ nickname });
-        if (existingUserByNickName) {
-            return res.status(400).json({ message: '이미 존재하는 사용자명입니다.' });
-        }
-        // 비밀번호 해싱
-        const hashedPassword = await bcrypt.hash(password, 10);
-        // 새 사용자 지정
-        const newUser = new User({
-            email,
-            password: hashedPassword,
-            name,
-            nickname,
-            birthday,
-            address,
-        });
-        await newUser.save();
-        //JWT 토큰 생성
-        const token = jwt.sign({ email: newUser.email, userId: newUser._id }, SECRET_KEY, { expiresIn: '1h' });
-
-        res.status(201).json({ token, message: 'Signup successful!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+try {
+    if (!email || !password || !name || !nickname || !birthday || !address) {
+        return res.status(400).json({ message: 'All fields are required' });
     }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return res.status(400).json({ message: '이미 존재하는 이메일입니다.' });
+    }
+
+    const existingUserByNickName = await User.findOne({ nickname });
+    if (existingUserByNickName) {
+        return res.status(400).json({ message: '이미 존재하는 사용자명입니다.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // role이 없다면 'user'로 기본값 설정
+    const newUser = new User({
+        email,
+        password: hashedPassword,
+        name,
+        nickname,
+        birthday,
+        address,
+        role: role || 'user',  // role 값을 요청에서 받으면 설정, 없으면 기본값 'user'
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ email: newUser.email, userId: newUser._id, role: newUser.role }, SECRET_KEY, { expiresIn: '1h' });
+
+    res.status(201).json({ token, message: 'Signup successful!' });
+} catch (error) {
+    res.status(500).json({ message: 'Server error' });
+}
+});
+
+// 인증 미들웨어 (사용자가 로그인된 상태인지 확인)
+const authenticateUser = (req, res, next) => {
+const token = req.headers['authorization'];
+
+if (!token) {
+  return res.status(403).json({ message: 'No token provided' });
+}
+
+try {
+  const tokenWithoutBearer = token.split(' ')[1];
+  const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+  req.user = decoded;  // 사용자 정보 저장
+  next();  // 다음 미들웨어로 넘어감
+} catch (error) {
+  res.status(401).json({ message: 'Invalid or expired token' });
+}
+};
+
+// 사용자 정보 가져오기
+app.get('/user/me', authenticateUser, async (req, res) => {
+const user = await User.findById(req.user.userId);
+if (!user) {
+  return res.status(404).json({ message: 'User not found' });
+}
+res.json(user);
+});
+
+
+// 관리자만 접근할 수 있는 API 예시
+app.get('/admin/dashboard', verifyRole(['admin']), async (req, res) => {
+    res.status(200).json({ message: 'Welcome to the admin dashboard', user: req.user });
+});
+
+// 일반 사용자만 접근할 수 있는 API 예시
+app.get('/user/profile', verifyRole(['user']), async (req, res) => {
+    const user = await User.findById(req.user.userId);
+    res.status(200).json({
+        name: user.name,
+        nickname: user.nickname,
+        email: user.email,
+        birthday: user.birthday.toISOString().split('T')[0],
+        address: user.address,
+        profileImage: user.profileImage,
+    });
 });
 
 // 사용자 프로필 라우트
@@ -175,39 +248,6 @@ const upload = multer({
     cb(null, true);
   }
 });
-
-// 현재 사용자 정보 가져오기 라우트
-app.get('/user/me', async (req, res) => {
-  const token = req.headers['authorization'];
-
-  if (!token) {
-    return res.status(403).json({ message: 'No token provided' });
-  }
-
-  try {
-    const tokenWithoutBearer = token.split(' ')[1];
-    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
-
-    const user = await User.findById(decoded.userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.status(200).json({
-      id: user._id,
-      name: user.name,
-      nickname: user.nickname,
-      email: user.email,
-      birthday: user.birthday,
-      address: user.address,
-      profileImage: user.profileImage,
-    });
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid or expired token' });
-  }
-});
-
 
 // 프로필 업데이트 라우트 ( 이미지 파일 처리 추가 )
 app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
@@ -297,7 +337,6 @@ app.get('/feeds/user/:userId', async (req, res) => {
     res.status(500).json({ message: '서버 오류' });
   }
 });
-
 
 // 피드 업로드 라우트
 app.post('/feeds/upload', upload.single('image'), async (req, res) => {
@@ -440,7 +479,6 @@ app.get('/feeds', async (req, res) => {
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 });
-
 
 // 서버 시작
 app.listen(PORT, () => {

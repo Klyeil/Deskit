@@ -14,30 +14,54 @@ import SiteSettingsPage from './pages/SiteSettingsPage';
 import FeedUpload from './pages/FeedUpload';
 import FeedPage from './pages/FeedPage';
 import FeedDetailPage from './pages/FeedDetailPage';
-
+import SellerPage from './pages/SellerPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboard from './pages/AdminDashBoard';
 
 
 function App() {
   return (
     <UserProvider>
-    <div className="App">
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/profile/verify-password" element={<PasswordCheckPage />} />
-        <Route path="/profile/settings" element={<ProfileSettingsPage />} />
-        <Route path="/settings" element={<SiteSettingsPage />} />
-        <Route path="/upload" element={<FeedUpload />} />
-        <Route path="/feeds" element={<FeedPage />} />
-        <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
-      </Routes>
-      <Footer />  {/* Footer 추가 */}
-    </div>
+      <div className="App">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/profile/verify-password" element={<PasswordCheckPage />} />
+          <Route path="/profile/settings" element={<ProfileSettingsPage />} />
+          <Route path="/settings" element={<SiteSettingsPage />} />
+          <Route path="/upload" element={<FeedUpload />} />
+          <Route path="/feeds" element={<FeedPage />} />
+          <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+
+          {/* 관리자 전용 페이지 라우트 
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          /> */}
+
+          {/* 판매자 전용 페이지 라우트 */}
+          <Route
+            path="/seller"
+            element={
+              <ProtectedRoute allowedRoles={['seller']}>
+                <SellerPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <Footer />
+      </div>
     </UserProvider>
   );
 }
+
 
 export default App;

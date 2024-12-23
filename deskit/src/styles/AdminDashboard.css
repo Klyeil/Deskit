@@ -1,0 +1,58 @@
+/* 전체 레이아웃 스타일 */
+.admin-dashboard {
+    display: flex;
+    background-color: #f8f9fa;
+    height: 100vh;
+  }
+  
+  /* 콘텐츠 영역 스타일 */
+  .admin-dashboard-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  /* 카드 스타일 */
+  .dashboard-card {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-card h6 {
+    font-size: 16px;
+    color: #6c757d;
+  }
+  
+  .dashboard-card h4 {
+    font-size: 28px;
+    margin-top: 10px;
+    color: #343a40;
+  }
+  
+  /* 그래프 컨테이너 */
+  .chart-container {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 간격 설정 */
+  .grid-spacing {
+    margin-top: 20px;
+  }
+
+  
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+  }
+  
+  .admin-dashboard-content {
+    padding: 20px;
+    flex-grow: 1;
+    background-color: #f8f9fa;
+  }
+   

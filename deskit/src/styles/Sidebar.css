@@ -1,0 +1,27 @@
+/* 사이드바 스타일 */
+.sidebar {
+    width: 240px;
+    background-color: #343a40;
+    color: #fff;
+    height: 100vh;
+    position: fixed;
+  }
+  
+  /* 사이드바 아이템 스타일 */
+  .sidebar .MuiListItem-root {
+    padding: 15px;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar .MuiListItem-root:hover {
+    background-color: #495057;
+  }
+  
+  .sidebar .MuiListItemIcon-root {
+    color: #adb5bd;
+  }
+  
+  .sidebar .MuiListItemText-root {
+    color: #fff;
+  }
+  

@@ -46,10 +46,15 @@ const FeedPage = () => {
     fetchUserProfile();
   }, []);
 
-    // 로그인 페이지로 이동
-    const goToLoginPage = () => {
-        navigate('/login'); // /login 경로로 이동
-    };
+  // 로그인 페이지로 이동
+  const goToLoginPage = () => {
+    navigate('/login'); // /login 경로로 이동
+  };
+
+  // 업로드 페이지로 이동
+  const goToUploadPage = () => {
+    navigate('/upload'); // /upload 경로로 이동
+  };
 
   return (
     <div className="feed-page-container">
@@ -76,14 +81,14 @@ const FeedPage = () => {
           <nav className="sidebar-nav">
             <a href="/" className="nav-item active"> 홈</a>
             <a href="#" className="nav-item"> 탐색</a>
-            <a href="/upload" className="nav-item active"> 업로드</a>
+            <a href="#" className="nav-item active"> 업로드</a>
             <a href="#" className="nav-item"> 알림</a>
             <a href="#" className="nav-item"> 저장된 게시물</a>
             <a href="#" className="nav-item"> 설정</a>
           </nav>
         </div>
         <div className="upload-feed">
-          <button className="upload-btn"><FaPlus /> Upload Feed</button>
+          <button className="upload-btn" onClick={goToUploadPage}>업로드</button>
         </div>
       </aside>
 

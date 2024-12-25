@@ -1,4 +1,3 @@
-
 .feed-detail-page {
   display: flex;
   justify-content: center;
@@ -16,7 +15,9 @@
   background-color: #fff;
   overflow-y: auto;
   margin-bottom: 20px; /* 페이지 하단에 여백 추가 */
-  margin-left : 50px;
+  margin-left: 50px;
+  display: flex;
+  flex-direction: column; /* 전체를 세로로 정렬 */
 }
 
 .feed-header {
@@ -47,7 +48,14 @@
   margin-left: 5px;
 }
 
+.feed-main-content {
+  display: flex;
+  flex-direction: row; /* 이미지와 오른쪽 영역 나란히 배치 */
+}
+
 .feed-image-section {
+  position: relative;
+  flex: 2;
   width: 100%;
   height: 400px; /* 이미지 크기 고정 */
   overflow: hidden;
@@ -59,42 +67,57 @@
   object-fit: cover; /* 이미지 비율 유지하며 고정 크기에 맞추기 */
 }
 
-.feed-description-section {
-  padding: 15px;
-  font-size: 14px;
-  line-height: 1.6;
+.product-info-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
 }
 
-.product-info-section {
-  padding: 10px 15px;
-  border-top: 1px solid #eee;
+.product-info-icon:hover {
+  background-color: rgba(255, 255, 255, 1);
 }
 
-.product-info-section h3 {
-  margin: 0 0 10px;
+.product-info-sidebar {
+  flex: 1;
+  margin-left: 20px;
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-info-sidebar h3 {
+  margin-bottom: 10px;
   font-size: 16px;
 }
 
-.product-item {
+.product-info-sidebar .product-item {
+  margin-bottom: 10px;
   font-size: 14px;
-  margin-bottom: 5px;
 }
 
-.product-item a {
+.product-info-sidebar .product-item a {
   color: #0073e6;
   text-decoration: none;
 }
 
-.product-item a:hover {
+.product-info-sidebar .product-item a:hover {
   text-decoration: underline;
   color: #0056b3;
 }
 
-.feed-date {
-  text-align: right;
-  padding: 10px;
-  font-size: 12px;
-  color: #777;
+.feed-description-section {
+  padding: 15px;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .feed-actions {
@@ -111,7 +134,6 @@
   margin-right: 10px;
   margin-left: 15px;
   margin-top: 10px;
-
 }
 
 .feed-actions span {
@@ -122,5 +144,3 @@
 .like-icon {
   color: gray;
 }
-
-

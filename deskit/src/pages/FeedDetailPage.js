@@ -4,6 +4,7 @@ import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { useUser } from '../context/UserContext';
 import { FiBookmark } from 'react-icons/fi';
 import '../styles/FeedDetailPage.css';
+import ProductList from './ProductList'; // 새로 만든 컴포넌트 가져오기
 
 const FeedDetailPage = () => {
   const { feedId } = useParams();
@@ -12,6 +13,7 @@ const FeedDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false); // 좋아요 상태
   const [saved, setSaved] = useState(false); // 저장 상태
+  const [showProductInfo, setShowProductInfo] = useState(false);
 
   useEffect(() => {
     const fetchFeedDetail = async () => {
@@ -84,10 +86,9 @@ const FeedDetailPage = () => {
             </div>
           </div>
 
-          {/* 설명 섹션 */}
-          <div className="feed-description-section">
-            <p className="feed-description">{feed.description || 'No description provided.'}</p>
-          </div>
+          {/* 제품 정보 사이드바 */}
+          {showProductInfo && <ProductList products={feed.products} />}
+
 
           {/* 제품 정보 섹션 */}
           <div className="product-info-section">

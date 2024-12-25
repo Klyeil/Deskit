@@ -1,15 +1,23 @@
 /* src/styles/Footer.css */
-footer {
+html, body {
+    height: 100%; /* 페이지 높이를 100%로 설정 */
+    margin: 0;    /* 불필요한 여백 제거 */
+  }
+  
+  body {
+    display: block; /* 기본 블록 레벨로 설정 */
+    min-height: 100%; /* 페이지 콘텐츠가 적더라도 footer가 아래로 밀리도록 설정 */
+    padding-bottom: 50px; /* footer 크기만큼 여유 공간을 추가 (footer 높이에 맞춰 조정) */
+  }
+  
+  footer {
     background-color: #333;
     color: #fff;
     text-align: center;
     padding: 0.5rem 0;  /* 여백을 더 줄여줌 */
     margin: 0;  /* 마진 초기화 */
     z-index: 800;
-}
-
-/* 전체 페이지에서 불필요한 여백을 없애는 방법 */
-body {
-    margin: 0;
-    padding: 0;
-}
+    position: absolute; /* 절대 위치 */
+    bottom: 0;   /* 페이지 맨 아래로 고정 */
+    width: 100%;  /* 가로 폭 100% */
+  }

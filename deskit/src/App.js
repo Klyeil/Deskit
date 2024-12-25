@@ -17,6 +17,10 @@ import FeedDetailPage from './pages/FeedDetailPage';
 import SellerPage from './pages/SellerPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashBoard';
+import CompanyManagement from './pages/CompanyManagement';
+import CategoryManagement from './pages/CategoryManagement';
+import ProductManagement from './pages/ProductManagement';
+import CompanyProducts from './pages/CompanyProducts';
 
 
 function App() {
@@ -36,7 +40,10 @@ function App() {
           <Route path="/feeds" element={<FeedPage />} />
           <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
-
+          <Route path="/admin/companies" element={<CompanyManagement/>} />
+          <Route path="/admin/categories" element={<CategoryManagement />} />
+          <Route path="/admin/products" element={<ProductManagement />} />
+          <Route path="/admin/products/:companyId" element={<CompanyProducts />} />
           {/* 관리자 전용 페이지 라우트 
           <Route
             path="/admin"
@@ -45,7 +52,7 @@ function App() {
                 <AdminDashboard />
               </ProtectedRoute>
             }
-          /> */}
+          />
 
           {/* 판매자 전용 페이지 라우트 */}
           <Route

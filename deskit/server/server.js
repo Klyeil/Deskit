@@ -9,6 +9,11 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Feed = require('./models/Feed');
+const companyRoutes = require('./routes/companyRoutes');
+const Company = require('./models/Company');
+const categoryRoutes = require('./routes/categoryRoutes');
+const productRoutes  = require('./routes/productRoutes');
+
 
 // 환경 변수 로드
 dotenv.config();
@@ -54,7 +59,6 @@ const UserSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', UserSchema);
-
 // 역할 검사 미들웨어
 const verifyRole = (roles) => {
 return (req, res, next) => {
@@ -317,6 +321,8 @@ app.get('/feeds/:feedId', async (req, res) => {
   }
 });
 
+
+
 // 사용자 ID로 피드 가져오기
 app.get('/feeds/user/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -338,8 +344,12 @@ app.get('/feeds/user/:userId', async (req, res) => {
   }
 });
 
+
 // 피드 업로드 라우트
 app.post('/feeds/upload', upload.single('image'), async (req, res) => {
+  console.log('Request Body:', req.body);
+  console.log('File:', req.file);
+
   const token = req.headers['authorization'];
 
   if (!token) {
@@ -350,29 +360,57 @@ app.post('/feeds/upload', upload.single('image'), async (req, res) => {
     const tokenWithoutBearer = token.split(' ')[1];
     const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
 
-    const { title, description } = req.body;
-    const userId = decoded.userId;
+    const { company, category, products } = req.body;
 
-    if (!title || !req.file) {
-      return res.status(400).json({ message: 'Title and image are required' });
+    if (!company || !category || !req.file) {
+      return res.status(400).json({
+        message: '모든 필드를 채워주세요.',
+        missingFields: {
+          company: !!company,
+          category: !!category,
+          image: !!req.file,
+          products: !!products,
+        },
+      });
     }
 
-    const imageUrl = `http://localhost:3001/uploads/${req.file.filename}`;
+    // products 파싱
+    let parsedProducts;
+    try {
+      parsedProducts = JSON.parse(products);
+    } catch (error) {
+      return res.status(400).json({ message: '유효하지 않은 제품 데이터입니다.' });
+    }
 
+    if (!Array.isArray(parsedProducts) || parsedProducts.length === 0) {
+      return res.status(400).json({ message: '적어도 하나의 제품을 선택해야 합니다.' });
+    }
+
+    // products 데이터 매핑
+    const feedProducts = parsedProducts.map((product) => ({
+      productId: product._id,
+      productName: product.name,
+      price: product.price,
+    }));
+
+    // 새로운 피드 생성
     const newFeed = new Feed({
-      userId,
-      title,
-      description,
-      image: imageUrl,
+      userId: decoded.userId,
+      image: `http://localhost:3001/uploads/${req.file.filename}`,
+      company,
+      category,
+      products: feedProducts,
     });
 
     await newFeed.save();
 
-    const feeds = await Feed.find({ userId: decoded.userId }).sort({ createdAt: -1 });
-
-    res.status(201).json({ message: 'Feed uploaded successfully!', feeds });
+    res.status(201).json({
+      message: 'Feed uploaded successfully!',
+      feed: newFeed,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error uploading feed:', error);
+    res.status(500).json({ message: '서버 오류로 인해 업로드 실패', error });
   }
 });
 
@@ -479,6 +517,15 @@ app.get('/feeds', async (req, res) => {
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 });
+
+// 회사 관리 라우트
+app.use('/companies', companyRoutes);
+
+// 카테고리 관리 라우트
+app.use('/categories', categoryRoutes);
+
+// 제품 관리 라우트
+app.use('/products', productRoutes);
 
 // 서버 시작
 app.listen(PORT, () => {

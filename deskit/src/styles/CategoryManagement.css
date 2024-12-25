@@ -1,0 +1,20 @@
+.category-management-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .category-management-container h5 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .category-management-container .table {
+    margin-top: 20px;
+  }
+  
+  .category-management-container .add-category {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }

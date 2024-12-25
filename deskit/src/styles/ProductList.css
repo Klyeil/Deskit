@@ -1,0 +1,26 @@
+.product-list {
+    padding: 20px;
+    background: #f7f7f7;
+    border-left: 1px solid #ddd;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .product-list h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .product-item {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .product-item a {
+    color: #0073e6;
+    text-decoration: none;
+  }
+  
+  .product-item a:hover {
+    text-decoration: underline;
+  }

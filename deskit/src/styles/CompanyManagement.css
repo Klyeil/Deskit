@@ -1,0 +1,152 @@
+/* src/styles/CompanyManagement.css */
+
+.company-management-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .company-management-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  /* 회사 추가 영역 */
+  .add-company-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .add-company-container input {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .add-company-container button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-company-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* 회사 목록 테이블 */
+  .company-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .company-table th,
+  .company-table td {
+    text-align: left;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+  
+  .company-table th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .company-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .company-table tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* 수정 및 삭제 버튼 */
+  .action-button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .action-button.edit {
+    background-color: #007bff;
+    color: white;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .action-button.edit:hover {
+    background-color: #0056b3;
+  }
+  
+  .action-button.delete {
+    background-color: #dc3545;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .action-button.delete:hover {
+    background-color: #b02a37;
+  }
+  
+  /* 다이얼로그 */
+  .dialog-container {
+    padding: 20px;
+  }
+  
+  .dialog-container input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .dialog-container .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .dialog-container .dialog-actions button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dialog-container .dialog-actions button.cancel {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .dialog-container .dialog-actions button.cancel:hover {
+    background-color: #5a6268;
+  }
+  
+  .dialog-container .dialog-actions button.save {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .dialog-container .dialog-actions button.save:hover {
+    background-color: #218838;
+  }

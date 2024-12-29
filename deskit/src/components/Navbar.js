@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaRegUser, FaWifi, FaCogs } from 'react-icons/fa'; // Admin 아이콘 추가
+import { FaRegUser, FaCogs } from 'react-icons/fa'; // Admin 아이콘 추가
 import { FiShoppingCart } from 'react-icons/fi';
 import { jwtDecode } from 'jwt-decode'; // jwt-decode에서 named import로 수정
 import '../styles/Navbar.css';
@@ -63,9 +63,6 @@ function Navbar() {
         />
       </form>
       <div className="nav-links">
-        <Link to="/feeds" className="nav-link">
-          <FaWifi size={25} />
-        </Link>
         <Link to="/cart" className="nav-link">
           <FiShoppingCart size={23} />
         </Link>

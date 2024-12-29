@@ -3,7 +3,6 @@ import './App.css'; // 스타일 추가
 import { Routes, Route } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
 import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import ProfilePage from './pages/ProfilePage';
@@ -29,7 +28,6 @@ function App() {
       <div className="App">
         <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/signup" element={<SignUpPage />} />
@@ -37,13 +35,14 @@ function App() {
           <Route path="/profile/settings" element={<ProfileSettingsPage />} />
           <Route path="/settings" element={<SiteSettingsPage />} />
           <Route path="/upload" element={<FeedUpload />} />
-          <Route path="/feeds" element={<FeedPage />} />
+          <Route path="/" element={<FeedPage />} />
           <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/companies" element={<CompanyManagement/>} />
           <Route path="/admin/categories" element={<CategoryManagement />} />
           <Route path="/admin/products" element={<ProductManagement />} />
           <Route path="/admin/products/:companyId" element={<CompanyProducts />} />
+
           {/* 관리자 전용 페이지 라우트 
           <Route
             path="/admin"

@@ -10,7 +10,6 @@ const path = require('path');
 const fs = require('fs');
 const Feed = require('./models/Feed');
 const companyRoutes = require('./routes/companyRoutes');
-const Company = require('./models/Company');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes  = require('./routes/productRoutes');
 
@@ -59,6 +58,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', UserSchema);
+
 // 역할 검사 미들웨어
 const verifyRole = (roles) => {
 return (req, res, next) => {
@@ -84,6 +84,8 @@ return (req, res, next) => {
 };
 };
 
+
+
 // 로그인 라우트
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -101,7 +103,7 @@ app.post('/login', async (req, res) => {
           return res.status(401).json({ message: 'Invalid email or password' });
       }
 
-      const token = jwt.sign({ email: user.email, userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+      const token = jwt.sign({ email: user.email, userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: '6h' });
 
       res.status(200).json({ token, message: 'Login successful!' });
   } catch (error) {
@@ -153,21 +155,22 @@ try {
 
 // 인증 미들웨어 (사용자가 로그인된 상태인지 확인)
 const authenticateUser = (req, res, next) => {
-const token = req.headers['authorization'];
+  const token = req.headers['authorization'];
 
-if (!token) {
-  return res.status(403).json({ message: 'No token provided' });
-}
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
 
-try {
-  const tokenWithoutBearer = token.split(' ')[1];
-  const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
-  req.user = decoded;  // 사용자 정보 저장
-  next();  // 다음 미들웨어로 넘어감
-} catch (error) {
-  res.status(401).json({ message: 'Invalid or expired token' });
-}
+  try {
+    const tokenWithoutBearer = token.split(' ')[1];
+    const decoded = jwt.verify(tokenWithoutBearer, SECRET_KEY);
+    req.user = decoded; // 사용자 정보 저장
+    next(); // 다음 미들웨어로 이동
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid or expired token' });
+  }
 };
+
 
 // 사용자 정보 가져오기
 app.get('/user/me', authenticateUser, async (req, res) => {
@@ -310,7 +313,14 @@ app.get('/feeds', async (req, res) => {
 // 피드 상세 정보 API
 app.get('/feeds/:feedId', async (req, res) => {
   try {
-    const feed = await Feed.findById(req.params.feedId);  // 피드 ID로 찾기
+    const feed = await Feed.findById(req.params.feedId)
+    .populate({
+      path: 'products.productId',
+      populate: {
+        path: 'company',
+        select: 'name', // 회사 이름만 가져오기
+      },
+    });  // 피드 ID로 찾기
     if (!feed) {
       return res.status(404).json({ message: '피드를 찾을 수 없습니다.' });
     }
@@ -527,7 +537,16 @@ app.use('/categories', categoryRoutes);
 // 제품 관리 라우트
 app.use('/products', productRoutes);
 
+// 로그인 상태 확인 라우트
+app.get('/auth/check', authenticateUser, (req, res) => {
+  res.status(200).json({ message: 'User is authenticated', user: req.user });
+});
+
+
+
+
 // 서버 시작
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+

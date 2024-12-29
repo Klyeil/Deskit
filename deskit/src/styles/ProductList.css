@@ -1,26 +1,37 @@
 .product-list {
-    padding: 20px;
-    background: #f7f7f7;
-    border-left: 1px solid #ddd;
-    max-height: 500px;
-    overflow-y: auto;
+    margin-top: 60px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
   }
   
   .product-list h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
+    margin: 0 0 10px;
+    font-size: 16px;
   }
   
   .product-item {
-    font-size: 14px;
     margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
   }
   
-  .product-item a {
-    color: #0073e6;
-    text-decoration: none;
+  .product-name {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
   }
   
-  .product-item a:hover {
-    text-decoration: underline;
+  .product-price,
+  .product-company {
+    display: block;
+    color: #555;
+  }
+
+  .product-item span {
+    display: block;
+    margin-bottom: 10px;
   }

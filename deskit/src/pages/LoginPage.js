@@ -24,8 +24,8 @@ function LoginPage() {
         // JWT 토큰을 localStorage에 저장
         localStorage.setItem('token', response.data.token);
         alert('로그인 성공!');
-        console.log("로그인 성공 후 프로필 페이지로 이동")
-        navigate('/profile');  // 로그인 후 프로필 페이지로 이동
+        console.log("로그인 성공 후  홈페이지로 이동")
+        navigate('/');  // 로그인 후 홈페이지로 이동
       }
     } catch (err) {
       // 로그인 실패 시 에러 처리

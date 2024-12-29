@@ -1,31 +1,36 @@
 .feed-detail-page {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
-  overflow-y: auto; /* 페이지가 스크롤 가능하게 */
-  height: 100vh; /* 화면 전체 높이에 맞추기 */
+  align-items: flex-start;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.feed-layout {
+  display: flex;
+  width: 100%;
+  max-width: 1000px; /* 전체 레이아웃의 최대 너비를 줄임 */
 }
 
 .feed-detail-container {
-  max-height: 800px;
-  max-width: 700px;
-  width: 100%;
+  margin-left: 120px;
+  flex: 0 0 700px;
+  margin-right: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #fff;
-  overflow-y: auto;
-  margin-bottom: 20px; /* 페이지 하단에 여백 추가 */
-  margin-left: 50px;
-  display: flex;
-  flex-direction: column; /* 전체를 세로로 정렬 */
+  overflow: hidden;
+  height: 60vh; /* 세로 길이를 늘림 */
+  width: 100%;
 }
 
 .feed-header {
   display: flex;
   align-items: center;
   padding: 10px;
+  margin-bottom:0px;
   border-bottom: 1px solid #eee;
-  margin-bottom: 0px;
 }
 
 .user-info {
@@ -38,109 +43,47 @@
   height: 50px;
   border-radius: 50%;
   margin-right: 10px;
-  margin-left: 12px;
-  margin-top: 8px;
 }
 
 .user-nickname {
   font-weight: bold;
-  margin-top: 5px;
-  margin-left: 5px;
-}
-
-.feed-main-content {
-  display: flex;
-  flex-direction: row; /* 이미지와 오른쪽 영역 나란히 배치 */
 }
 
 .feed-image-section {
   position: relative;
-  flex: 2;
   width: 100%;
-  height: 400px; /* 이미지 크기 고정 */
+  height: 400px;
   overflow: hidden;
 }
 
 .feed-main-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 이미지 비율 유지하며 고정 크기에 맞추기 */
+  object-fit: cover;
 }
 
 .product-info-icon {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 8px;
-  border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s;
-}
-
-.product-info-icon:hover {
-  background-color: rgba(255, 255, 255, 1);
-}
-
-.product-info-sidebar {
-  flex: 1;
-  margin-left: 20px;
-  background-color: #f4f4f4;
-  padding: 20px;
-  border-radius: 8px;
-  max-height: 400px;
-  overflow-y: auto;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.product-info-sidebar h3 {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.product-info-sidebar .product-item {
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-.product-info-sidebar .product-item a {
-  color: #0073e6;
-  text-decoration: none;
-}
-
-.product-info-sidebar .product-item a:hover {
-  text-decoration: underline;
-  color: #0056b3;
-}
-
-.feed-description-section {
-  padding: 15px;
-  font-size: 14px;
-  line-height: 1.6;
 }
 
 .feed-actions {
   display: flex;
-  justify-content: flex-start; /* 아이콘을 왼쪽에 배치 */
-  padding: 10px 0;
+  justify-content: space-between;
+  padding: 10px 15px;
   border-top: 1px solid #eee;
 }
 
-.feed-actions div {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  margin-right: 10px;
-  margin-left: 15px;
-  margin-top: 10px;
+.feed-description-section {
+  padding: 15px;
 }
 
-.feed-actions span {
-  margin-left: 5px;
-  font-size: 14px;
-}
-
-.like-icon {
-  color: gray;
+.product-info-sidebar {
+  flex: 0 0 300px;
+  border-radius: 8px;
+  padding: 15px;
+  height: 57vh; /* 세로 길이를 늘림 */
+  overflow-y: auto; /* 스크롤 가능하게 설정 */
 }

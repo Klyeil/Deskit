@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { AiFillHeart, AiOutlineHeart, AiOutlineInfoCircle } from 'react-icons/ai';
+import { MdBookmark, MdBookmarkBorder } from 'react-icons/md';
 import { useUser } from '../context/UserContext';
-import { FiBookmark } from 'react-icons/fi';
 import '../styles/FeedDetailPage.css';
-import ProductList from './ProductList'; // 새로 만든 컴포넌트 가져오기
+import ProductList from './ProductList'; // 제품 정보 컴포넌트
 
 const FeedDetailPage = () => {
   const { feedId } = useParams();
@@ -13,7 +13,7 @@ const FeedDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false); // 좋아요 상태
   const [saved, setSaved] = useState(false); // 저장 상태
-  const [showProductInfo, setShowProductInfo] = useState(false);
+  const [showProductInfo, setShowProductInfo] = useState(false); // 제품 정보 토글 상태
 
   useEffect(() => {
     const fetchFeedDetail = async () => {
@@ -37,12 +37,17 @@ const FeedDetailPage = () => {
 
   // 좋아요 버튼 클릭 핸들러
   const handleLike = () => {
-    setLiked(!liked);
+    setLiked((prev) => !prev);
   };
 
   // 저장 버튼 클릭 핸들러
   const handleSave = () => {
-    setSaved(!saved);
+    setSaved((prev) => !prev);
+  };
+
+  // 제품 정보 토글 핸들러
+  const toggleProductInfo = () => {
+    setShowProductInfo((prev) => !prev);
   };
 
   return (
@@ -50,61 +55,51 @@ const FeedDetailPage = () => {
       {loading || userLoading ? (
         <p>Loading...</p>
       ) : feed ? (
-        <div className="feed-detail-container">
-          {/* 헤더: 사용자 정보 */}
-          <div className="feed-header">
-             <div className="user-info">
+        <div className="feed-layout">
+          {/* 중앙의 피드 상세 정보 */}
+          <div className="feed-detail-container">
+            {/* 헤더: 사용자 정보 */}
+            <div className="feed-header">
+              <div className="user-info">
                 {user && user.profileImage ? (
-                <img
-                     src={`http://localhost:3001${user.profileImage}`}
-                     alt="Profile"
-                     className="user-profile-image"
-                />
+                  <img
+                    src={`http://localhost:3001${user.profileImage}`}
+                    alt="Profile"
+                    className="user-profile-image"
+                  />
                 ) : (
-            <div className="profile-placeholder">No Image</div>
+                  <div className="profile-placeholder">No Image</div>
                 )}
-            <span className="user-nickname">
-            @ {user ? user.nickname : 'Unknown User'}
-            </span>
-            
-          </div>
-        </div>
-
-
-          {/* 이미지 섹션 */}
-          <div className="feed-image-section">
-            <img src={feed.image} alt="Desk Setup" className="feed-main-image" />
-          </div>
-
-          {/* 좋아요 및 저장 아이콘 */}
-          <div className="feed-actions">
-            <div className="like-icon" onClick={handleLike}>
-              {liked ? <AiFillHeart color="#7655E3" size={24} /> : <AiOutlineHeart color="gray" size={24} />}
+                <span className="user-nickname">@ {user ? user.nickname : 'Unknown User'}</span>
+              </div>
             </div>
-            <div className="save-icon" onClick={handleSave}>
-            <FiBookmark color={saved ? "#7655E3" : "gray"} size={24} /> {/* saved 상태에 따라 색상 변경 */}
+
+            {/* 이미지 섹션 */}
+            <div className="feed-image-section">
+              <img src={feed.image} alt="Desk Setup" className="feed-main-image" />
+              <div className="product-info-icon" onClick={toggleProductInfo}>
+                <AiOutlineInfoCircle size={24} />
+              </div>
             </div>
+
+            {/* 좋아요 및 저장 아이콘 */}
+            <div className="feed-actions">
+              <div className="like-icon" onClick={handleLike}>
+                {liked ? <AiFillHeart color="#7655E3" size={24} /> : <AiOutlineHeart color="gray" size={24} />}
+              </div>
+              <div className="save-icon" onClick={handleSave}>
+                {saved ? <MdBookmark color="#7655E3" size={24} /> : <MdBookmarkBorder color="gray" size={24} />}
+              </div>
+            </div>
+
           </div>
 
-          {/* 제품 정보 사이드바 */}
-          {showProductInfo && <ProductList products={feed.products} />}
-
-
-          {/* 제품 정보 섹션 */}
-          <div className="product-info-section">
-            <h3>📋 사용된 제품 정보</h3>
-            <ul>
-              {feed.products && feed.products.length > 0 ? (
-                feed.products.map((product, index) => (
-                  <li key={index} className="product-item">
-                    <span>{product.name}</span> - <a href={product.link} target="_blank" rel="noopener noreferrer">구매 링크</a>
-                  </li>
-                ))
-              ) : (
-                <p>제품 정보가 없습니다.</p>
-              )}
-            </ul>
-          </div>
+          {/* 오른쪽 제품 정보 섹션 */}
+          {showProductInfo && (
+            <div className="product-info-sidebar">
+              <ProductList products={feed.products} />
+            </div>
+          )}
         </div>
       ) : (
         <p>Feed not found</p>

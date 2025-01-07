@@ -79,10 +79,7 @@ const FeedPage = () => {
             <button onClick={() => setActivePage('feed')} className={`nav-item ${activePage === 'feed' ? 'active' : ''}`}>
               피드
             </button>
-            <button
-              onClick={() => setActivePage('community')}
-              className={`nav-item ${activePage === 'community' ? 'active' : ''}`}
-            >
+            <button onClick={() => setActivePage('community')} className={`nav-item ${activePage === 'community' ? 'active' : ''}`}>
               커뮤니티
             </button>
           </nav>
@@ -94,7 +91,7 @@ const FeedPage = () => {
         </div>
       </aside>
 
-      {/* 메인 콘텐츠 */}
+      {/* 메인 콘텐츠 영역 */}
       <main className="feed-content">
         {activePage === 'feed' ? <FeedContent /> : <CommunityContent />}
       </main>
@@ -103,3 +100,4 @@ const FeedPage = () => {
 };
 
 export default FeedPage;
+

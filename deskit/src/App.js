@@ -20,6 +20,9 @@ import CompanyManagement from './pages/CompanyManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import ProductManagement from './pages/ProductManagement';
 import CompanyProducts from './pages/CompanyProducts';
+import ProductListPage from './pages/ProductListPage';
+import SellerDashboard from './pages/SellerDashBoard';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 
 function App() {
@@ -36,12 +39,16 @@ function App() {
           <Route path="/settings" element={<SiteSettingsPage />} />
           <Route path="/upload" element={<FeedUpload />} />
           <Route path="/" element={<FeedPage />} />
+          <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/:productId" element={<ProductDetailPage />} /> {/* 상세 페이지 경로 */}
           <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/seller" element={<SellerDashboard />} />
           <Route path="/admin/companies" element={<CompanyManagement/>} />
           <Route path="/admin/categories" element={<CategoryManagement />} />
           <Route path="/admin/products" element={<ProductManagement />} />
           <Route path="/admin/products/:companyId" element={<CompanyProducts />} />
+
 
           {/* 관리자 전용 페이지 라우트 
           <Route
@@ -63,7 +70,6 @@ function App() {
             }
           />
         </Routes>
-        <Footer />
       </div>
     </UserProvider>
   );

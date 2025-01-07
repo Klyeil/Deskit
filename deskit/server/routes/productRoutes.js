@@ -1,64 +1,72 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
-const mongoose = require('mongoose');
+const { authenticateUser } = require('../middleware/authMiddleware');
+const multer = require('multer');
+const path = require('path');
 
-// 회사별 제품 목록 가져오기
-router.get('/company/:companyId', async (req, res) => {
-    const { companyId } = req.params;
-    console.log('Received companyId:', companyId); // 디버깅
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
 
-    if (!mongoose.Types.ObjectId.isValid(companyId)) {
-      return res.status(400).json({ message: '유효하지 않은 회사 ID입니다.' });
-    }
-  
-    try {
-      const products = await Product.find({ company: companyId }).populate('category', 'name');
-      console.log('Fetched products:', products); // 디버깅
-      if (!products.length) {
-        return res.status(200).json([]);
-      }
-      res.status(200).json(products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ message: '서버 오류로 인해 제품을 가져올 수 없습니다.', error });
-    }
-  });
+// 제품 목록 가져오기
+router.get('/list', async (req, res) => {
+  try {
+    const products = await Product.find().populate('category company'); // 카테고리와 회사를 포함하여 가져옴
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('제품 목록 가져오기 오류:', error);
+    res.status(500).json({ message: '제품 목록을 가져올 수 없습니다.', error });
+  }
+});
 
+// 제품 추가 라우트
+router.post('/add', authenticateUser, upload.single('image'), async (req, res) => {
+  const { name, price, company, category, description, stock } = req.body;
 
-// 새 제품 추가
-router.post('/add', async (req, res) => {
-    const { name, company, category, price } = req.body;
-  
-    if (!name || !company || !category || !price) {
-      return res.status(400).json({ message: '모든 필드를 입력해야 합니다.' });
-    }
-  
-    try {
-      const newProduct = new Product({ name, company, category, price });
-      await newProduct.save();
-      res.status(201).json({ message: '제품이 성공적으로 추가되었습니다!', product: newProduct });
-    } catch (error) {
-      console.error('Error adding product:', error);
-      res.status(500).json({ message: '서버 오류로 인해 제품 추가에 실패했습니다.', error });
-    }
-  });
+  if (!name || !price || !company || !category || !description || !stock || !req.file) {
+    return res.status(400).json({ message: '모든 필드를 채워주세요.' });
+  }
 
-// 제품 필터링 라우트
-router.get('/filter', async (req, res) => {
-    const { company, category } = req.query;
-  
-    if (!company || !category) {
-      return res.status(400).json({ message: '회사와 카테고리는 필수입니다.' });
+  try {
+    const newProduct = new Product({
+      name,
+      price,
+      company,
+      category,
+      description,
+      stock,
+      image: `/uploads/${req.file.filename}`,
+    });
+
+    await newProduct.save();
+    res.status(201).json({ message: '제품이 성공적으로 등록되었습니다.', product: newProduct });
+  } catch (error) {
+    console.error('제품 등록 오류:', error);
+    res.status(500).json({ message: '제품 등록 실패', error });
+  }
+});
+
+router.get('/:productId', async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findById(productId).populate('category company');
+    if (!product) {
+      return res.status(404).json({ message: '제품을 찾을 수 없습니다.' });
     }
-  
-    try {
-      const products = await Product.find({ company, category });
-      res.status(200).json(products);
-    } catch (error) {
-      console.error('Error fetching filtered products:', error);
-      res.status(500).json({ message: '서버 오류로 인해 제품을 가져올 수 없습니다.', error });
-    }
-  });
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('제품 상세 정보 가져오기 오류:', error);
+    res.status(500).json({ message: '서버 오류로 인해 제품을 가져올 수 없습니다.', error });
+  }
+});
 
 module.exports = router;
+

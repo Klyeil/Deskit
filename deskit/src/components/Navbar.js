@@ -63,7 +63,7 @@ function Navbar() {
         />
       </form>
       <div className="nav-links">
-        <Link to="/cart" className="nav-link">
+        <Link to="/products" className="nav-link">
           <FiShoppingCart size={23} />
         </Link>
         {/* Admin 역할 사용자만 Admin 페이지 아이콘 표시 */}

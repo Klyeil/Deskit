@@ -12,6 +12,7 @@ const Feed = require('./models/Feed');
 const companyRoutes = require('./routes/companyRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes  = require('./routes/productRoutes');
+const feedRoutes = require('./routes/feedRoutes');
 
 
 // 환경 변수 로드
@@ -291,6 +292,9 @@ app.put('/profile/update', upload.single('profileImage'), async (req, res) => {
   }
 });
 
+// 피드 랜덤 라우트
+app.use('/feeds', feedRoutes);
+
 // 피드 가져오기 라우트
 app.get('/feeds', async (req, res) => {
   const token = req.headers['authorization'];
@@ -541,6 +545,9 @@ app.use('/products', productRoutes);
 app.get('/auth/check', authenticateUser, (req, res) => {
   res.status(200).json({ message: 'User is authenticated', user: req.user });
 });
+
+
+
 
 
 

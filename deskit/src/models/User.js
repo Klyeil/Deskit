@@ -11,8 +11,9 @@ const userSchema = new mongoose.Schema({
   address: { type: String, required: true },
   role : { 
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user' }
+    enum: ['user', 'seller', 'admin'],
+    default: 'user' },
+  profileImage: { type: String }, // 프로필 이미지 URL
 }, { timestamps: true });
 
 // 비밀번호를 저장하기 전에 해시화하는 함수

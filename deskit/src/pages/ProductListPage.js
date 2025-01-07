@@ -45,7 +45,7 @@ const ProductListPage = () => {
     <div className="product-page-layout">
       {/* 필터 사이드바 */}
       <aside className="sidebars">
-        <h3 className="sidebar-title">Categories</h3>
+        <h3 className="sidebar-title">CATEGORIES</h3>
         <ul className="category-list">
           {categories.map((category) => (
             <li key={category._id} className="category-item">
@@ -56,7 +56,7 @@ const ProductListPage = () => {
           ))}
         </ul>
 
-        <h3 className="sidebar-title">Filter by Price</h3>
+        <h3 className="sidebar-title">FILTER BY PRICE</h3>
         <div className="price-filter">
         <Slider
   className="price-slider"
@@ -69,9 +69,7 @@ const ProductListPage = () => {
     // props와 state가 정의되어 있는지 확인
     if (!props || !state) return null;
 
-    const backgroundStyle = state.index === 1
-      ? 'linear-gradient(to right, #ddd, #7655E3)'
-      : '#ddd';
+    const backgroundStyle = '#ddd';
 
     return (
       <div
@@ -95,7 +93,7 @@ const ProductListPage = () => {
           ...props.style,
           height: '20px',
           width: '20px',
-          backgroundColor: '#7655E3',
+          backgroundColor: '#a593e0',
           borderRadius: '50%',
           cursor: 'pointer',
           top: '-5px', // 중앙 정렬

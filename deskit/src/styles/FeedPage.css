@@ -10,7 +10,7 @@ html, body {
     display: flex;
     gap: 20px;
     padding: 20px;
-    background-color: #f3f3f3;
+    background-color: #fff;
     height: 100vh;
     box-sizing: border-box;
   }
@@ -101,7 +101,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #3c3D3E;
+    background-color: #566270;
     color: white;
     padding: 10px 16px;
     border-radius: 10px;
@@ -113,8 +113,7 @@ html, body {
     margin-left: 3px;
   }
 
-  .uploads-btn:hover {
-  }
+
   
 
   

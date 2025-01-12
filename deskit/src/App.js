@@ -23,6 +23,7 @@ import CompanyProducts from './pages/CompanyProducts';
 import ProductListPage from './pages/ProductListPage';
 import SellerDashboard from './pages/SellerDashBoard';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ProductEditPage from './pages/ProductEditPage';
 
 
 function App() {
@@ -44,6 +45,8 @@ function App() {
           <Route path="/feed-detail/:feedId" element={<FeedDetailPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/seller" element={<SellerDashboard />} />
+          <Route path="/seller/edit/:productId" element={<ProductEditPage />} />
+          <Route path="/seller/add" element={<ProductEditPage />} />
           <Route path="/admin/companies" element={<CompanyManagement/>} />
           <Route path="/admin/categories" element={<CategoryManagement />} />
           <Route path="/admin/products" element={<ProductManagement />} />

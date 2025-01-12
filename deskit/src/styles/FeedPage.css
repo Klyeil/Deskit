@@ -112,11 +112,10 @@ html, body {
     height: 150%;
     margin-left: 3px;
   }
-
-
-  
-
-  
+ .uploads-btn:hover{
+  background-color: #000;
+ }
+ 
   
 /* 메인 피드 스타일 */
     /* 메인 피드 영역에서만 스크롤을 허용 */

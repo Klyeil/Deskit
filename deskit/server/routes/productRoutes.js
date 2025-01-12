@@ -68,5 +68,55 @@ router.get('/:productId', async (req, res) => {
   }
 });
 
+// 제품 수정 라우트
+router.put('/:productId', authenticateUser, upload.single('image'), async (req, res) => {
+  const { productId } = req.params;
+  const { name, price, company, category, description, stock } = req.body;
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: '제품을 찾을 수 없습니다.' });
+    }
+
+    // 필드 업데이트
+    product.name = name || product.name;
+    product.price = price || product.price;
+    product.company = company || product.company;
+    product.category = category || product.category;
+    product.description = description || product.description;
+    product.stock = stock || product.stock;
+
+    // 이미지 업데이트
+    if (req.file) {
+      product.image = `/uploads/${req.file.filename}`;
+    }
+
+    await product.save();
+    res.status(200).json({ message: '제품이 성공적으로 수정되었습니다.', product });
+  } catch (error) {
+    console.error('제품 수정 오류:', error);
+    res.status(500).json({ message: '제품 수정에 실패했습니다.', error });
+  }
+});
+
+// 제품 삭제 라우트
+router.delete('/:productId', authenticateUser, async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findByIdAndDelete(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: '제품을 찾을 수 없습니다.' });
+    }
+
+    res.status(200).json({ message: '제품이 성공적으로 삭제되었습니다.' });
+  } catch (error) {
+    console.error('제품 삭제 오류:', error);
+    res.status(500).json({ message: '제품 삭제에 실패했습니다.', error });
+  }
+});
+
 module.exports = router;
 
